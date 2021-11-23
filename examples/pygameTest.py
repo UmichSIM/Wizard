@@ -1,4 +1,5 @@
 import pygame
+import controller
 
 
 # Define some colors.
@@ -44,7 +45,8 @@ done = False
 clock = pygame.time.Clock()
 
 # Initialize the joysticks.
-pygame.joystick.init()
+# pygame.joystick.init()
+controllers = [controller.Controller(joystickId) for joystickId in range(pygame.joystick.get_count())]
 
 # Get ready to print.
 textPrint = TextPrint()
@@ -80,8 +82,9 @@ while not done:
 
     # For each joystick:
     for i in range(joystick_count):
-        joystick = pygame.joystick.Joystick(i)
-        joystick.init()
+        # joystick = pygame.joystick.Joystick(i)
+        # joystick.init()
+        joystick = controllers[i]
 
         try:
             jid = joystick.get_instance_id()
