@@ -255,9 +255,9 @@ class DualControl(object):
         forceFriction(wheelOne, 0.0)
         forceFriction(wheelTwo, 0.0)
 
-        self._joystickD = controller(0)
+        self._joystickD = pygame.joystick.Joystick(0)
 
-        self._joystickW = controller(1)
+        self._joystickW = pygame.joystick.Joystick(1)
 
         self._joystick = self._joystickD
         self._driver = 'Human'
