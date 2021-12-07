@@ -246,18 +246,20 @@ class DualControl(object):
         self.wheelOne = hid.Device(None, None, None, devices[0]['path'])
         self.wheelTwo = hid.Device(None, None, None, devices[1]['path'])
 
-        autoCenter(wheelOne, False)
-        autoCenter(wheelTwo, False)
+        autoCenter(self.wheelOne, False)
+        autoCenter(self.wheelTwo, False)
 
-        forceOff(wheelOne)
-        forceOff(wheelTwo)
+        forceOff(self.wheelOne)
+        forceOff(self.wheelTwo)
         
-        forceFriction(wheelOne, 0.0)
-        forceFriction(wheelTwo, 0.0)
+        forceFriction(self.wheelOne, 0.0)
+        forceFriction(self.wheelTwo, 0.0)
 
         self._joystickD = pygame.joystick.Joystick(0)
+        self._joystick.init()
 
         self._joystickW = pygame.joystick.Joystick(1)
+        self._joystick.init()
 
         self._joystick = self._joystickD
         self._driver = 'Human'
