@@ -27,6 +27,7 @@ import glob
 import os
 import sys
 import evdev
+from evdev import ecodes
 
 try:
     sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
@@ -232,27 +233,13 @@ class DualControl(object):
         # self._joystick = pygame.joystick.Joystick(0)
         # self._joystick.init()
 
-        vid = 0x046d    # Vendor ID is Logitech
-        pid = 0xc24f    # Product ID for G29
 
-        # enumerate looks through all hid devices for those that match parameters
-        devices = hid.enumerate(vid,pid)
 
-        #look for devices with usage_page == 1 or interface_number == 0
-        devices = list(filter(lambda device: device['interface_number'] == 0 
-                              and device['usage_page'] == 1, devices))
 
-        self.wheelOne = hid.Device(None, None, None, devices[0]['path'])
-        self.wheelTwo = hid.Device(None, None, None, devices[1]['path'])
 
-        autoCenter(self.wheelOne, False)
-        autoCenter(self.wheelTwo, False)
-
-        forceOff(self.wheelOne)
-        forceOff(self.wheelTwo)
-        
-        forceFriction(self.wheelOne, 0.0)
-        forceFriction(self.wheelTwo, 0.0)
+        # TODO: add device name
+        self.evWheelOne = evdev.InputDevice("")
+        self.evWheelTwo = evdev.InputDevice("")
 
         self._joystickD = pygame.joystick.Joystick(0)
         self._joystickD.init()
@@ -341,12 +328,35 @@ class DualControl(object):
             if isinstance(self._control, carla.VehicleControl):
                 self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
                 self._parse_vehicle_wheel()
+                self._parse_speedToWheel(world)
                 self._control.reverse = self._control.gear < 0
                 # Wizard
                 world.driver = self._driver
             elif isinstance(self._control, carla.WalkerControl):
                 self._parse_walker_keys(pygame.key.get_pressed(), clock.get_time())
             world.player.apply_control(self._control)
+
+    def _parse_speedToWheel(self,world):
+        # adjusts steering wheel autocenter using speed
+
+        v = world.player.get_velocity()
+        speed = (3.6 * math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2))
+
+        # speed limit that influences the autocenter
+        S2W_THRESHOLD = 90
+        if(speed > S2W_THRESHOLD):
+            speed = S2W_THRESHOLD
+        # autocenterCmd  \in [0,65535]
+        autocenterCmd = 60000 * math.sin(speed/S2W_THRESHOLD)
+
+        active_wheel = None
+        if self._state == 0:
+            active_wheel = self.evWheelOne
+        else:
+            active_wheel = self.evWheelTwo
+        # send autocenterCmd to the steeringwheel
+        active_wheel.write(ecodes.EV_FF, ecodes.FF_AUTOCENTER, int(autocenterCmd))
+
 
     def _parse_vehicle_keys(self, keys, milliseconds):
         self._control.throttle = 1.0 if keys[K_UP] or keys[K_w] else 0.0
@@ -368,24 +378,14 @@ class DualControl(object):
         
         if self._joystickD.get_button(6) or self._joystickW.get_button(7):
             self._joystick = self._joystickD
-            forceOff(self.wheelTwo)
             #forceFollow(self.wheelTwo, self._joystickW.get_axis(0))
             self._state = 0
             self._driver = 'Wizard'
         elif self._joystickD.get_button(7) or self._joystickW.get_button(6):
             self._joystick = self._joystickW
-            forceOff(self.wheelOne)
             #forceFollow(self.wheelOne, self._joystickD.get_axis(0))
             self._state = 1
             self._driver = 'Human'
-
-        autoCenter(self.wheelOne, False)
-        autoCenter(self.wheelTwo, False)            
-        
-        if(self._state):
-            forceFollow(self.wheelTwo, self._joystickW.get_axis(0))
-        else:
-            forceFollow(self.wheelOne, self._joystickD.get_axis(0))
 
         ######################### End Wizard ###########################
 
