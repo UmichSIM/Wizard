@@ -225,9 +225,9 @@ class DualControl(object):
         # initialize steering wheel
         pygame.joystick.init()
 
-        joystick_count = pygame.joystick.get_count()
-        if joystick_count != 2:
-            raise ValueError("Please Connect Just Two Joysticks")
+        # joystick_count = pygame.joystick.get_count()
+        # if joystick_count != 2:
+        #     raise ValueError("Please Connect Just Two Joysticks")
 
         ######################### Begin Wizard #########################
         # self._joystick = pygame.joystick.Joystick(0)
@@ -238,14 +238,14 @@ class DualControl(object):
 
 
         # TODO: add device name
-        self.evWheelOne = evdev.InputDevice("")
-        self.evWheelTwo = evdev.InputDevice("")
+        self.evWheelOne = evdev.InputDevice("/dev/input/event19")
+        # self.evWheelTwo = evdev.InputDevice("")
 
         self._joystickD = pygame.joystick.Joystick(0)
         self._joystickD.init()
 
-        self._joystickW = pygame.joystick.Joystick(1)
-        self._joystickW.init()
+        # self._joystickW = pygame.joystick.Joystick(1)
+        # self._joystickW.init()
 
         self._joystick = self._joystickD
         self._driver = 'Human'
@@ -256,7 +256,7 @@ class DualControl(object):
 
         self._parser = ConfigParser()
         # Update PATH TO wheel_config.ini
-        self._parser.read(r'C:\\Users\\Eric Landgraf\Default\\Umich\\UMTRI\\CARLA_0.9.9.2-W\wheel_config.ini')
+        self._parser.read(r'/home/green/carla/wheel_config.ini')
         #self._parser.read(r'E:\\CARLA\\carla\\wheel_config.ini')
         #self._parser.read('wheel_config.ini')
         self._steer_idx = int(
@@ -376,16 +376,8 @@ class DualControl(object):
 
         ######################### Begin Wizard #########################
         
-        if self._joystickD.get_button(6) or self._joystickW.get_button(7):
-            self._joystick = self._joystickD
-            #forceFollow(self.wheelTwo, self._joystickW.get_axis(0))
-            self._state = 0
-            self._driver = 'Wizard'
-        elif self._joystickD.get_button(7) or self._joystickW.get_button(6):
-            self._joystick = self._joystickW
-            #forceFollow(self.wheelOne, self._joystickD.get_axis(0))
-            self._state = 1
-            self._driver = 'Human'
+     
+       
 
         ######################### End Wizard ###########################
 
