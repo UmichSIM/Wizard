@@ -8,9 +8,9 @@ import time
 import pygame
 import config
 
-class CameraManager(object):
+class CameraManager:
     """
-    Manage whether to
+    Manage graphics stuffs with carla
     """
     def __init__(self, parent_actor, hud):
         self.sensor = None
