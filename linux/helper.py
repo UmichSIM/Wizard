@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import re
+import carla
 
 def find_weather_presets():
     rgx = re.compile('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)')
