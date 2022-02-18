@@ -6,6 +6,8 @@ from linux.carla.LaneInvasionSensor import LaneInvasionSensor
 from linux.carla.GnssSensor import GnssSensor
 from linux.carla.IMUSensor import IMUSensor
 from linux.carla.CameraManager import CameraManager
+
+
 class World(object):
     def __init__(self, carla_world, hud, actor_filter):
         self.world = carla_world
@@ -34,7 +36,7 @@ class World(object):
         if blueprint.has_attribute('color'):
             color = random.choice(blueprint.get_attribute('color').recommended_values)
             blueprint.set_attribute('color', color)
-        # Spawn the player.
+            # Spawn the player.
         if self.player is not None:
             spawn_point = self.player.get_transform()
             spawn_point.location.z += 2.0
@@ -46,7 +48,7 @@ class World(object):
             spawn_points = self.world.get_map().get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
-        # Set up the sensors.
+            # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.player, self.hud)
         self.lane_invasion_sensor = LaneInvasionSensor(self.player, self.hud)
         self.gnss_sensor = GnssSensor(self.player)

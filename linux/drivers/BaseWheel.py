@@ -13,15 +13,16 @@ class BaseWheel(ABC):
     def __init__(self):
         # register events
         # TODO: register keys
-        self.ev_sync_event:dict = {}
         self.ev_key_event:dict = {}
         self.ev_abs_event:dict = {}
-        self.ev_events = [self.ev_sync_event,
+        self.ev_events:list = [None,
                           self.ev_key_event,
                           None,
                           self.ev_abs_event]
+        self.ev_type_accepted:tuple = (1,3)
         # evdev device
-        self.ev:evdev.InputDevice = None
+        self.ev = None
+        self.ev_name:str = ""
 
     def __init(self):
         assert(self.ev.name == self.ev_name) # check device name
@@ -53,7 +54,8 @@ class BaseWheel(ABC):
         Capture and handle events using asyncio
         '''
         async for event in self.ev.async_read_loop():
-            print(self.ev.path, evdev.categorize(event), sep=': ')
+            try:
+                self.ev_events[event.]
 
         return 0
 
@@ -73,3 +75,9 @@ class BaseWheel(ABC):
         """
         assert(val >= 0 and val <= 1)
         self.ev.write(ecodes.EV_FF, ff_type, int(65535*val))
+
+
+    def __sync_event_handler(self, event):
+        """
+        handler for sync event
+        """
