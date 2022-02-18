@@ -224,7 +224,7 @@ class World(object):
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
         # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.player, self.hud)
-        self.lane_invasion_sensor = LaneInvasionSensor(self.player, self.hud)
+        self.lane_invasion_sensor = LaneInvasionSensor(self, self.player, self.hud)
         self.gnss_sensor = GnssSensor(self.player)
         self.imu_sensor = IMUSensor(self.player)
         self.camera_manager = CameraManager(self.player, self.hud, self._gamma)
@@ -553,11 +553,11 @@ class HUD(object):
             'GNSS:% 24s' % ('(% 2.6f, % 3.6f)' % (world.gnss_sensor.lat, world.gnss_sensor.lon)),
             'Height:  % 18.0f m' % t.location.z,
             '']
-        f = open("../../../arduino_projects/import_txt_test/accels.txt", "a")
+        # f = open("../../../arduino_projects/import_txt_test/accels.txt", "a")
         # f.write(str(round((3.6 * math.sqrt(v.x**2 + v.y**2 + v.z**2)) % 255, 2)))
-        f.write(str(round(world.imu_sensor.accelerometer[0], 2)))
-        f.write('\n')
-        f.close()
+        # f.write(str(round(world.imu_sensor.accelerometer[0], 2)))
+        # f.write('\n')
+        # f.close()
         if isinstance(c, carla.VehicleControl):
             self._info_text += [
                 ('Throttle:', c.throttle, 0.0, 1.0),
@@ -739,7 +739,7 @@ class CollisionSensor(object):
 
 
 class LaneInvasionSensor(object):
-    def __init__(self, parent_actor, hud):
+    def __init__(self, world_obj, parent_actor, hud):
         self.sensor = None
         self._parent = parent_actor
         self.hud = hud
@@ -749,18 +749,20 @@ class LaneInvasionSensor(object):
         # We need to pass the lambda a weak reference to self to avoid circular
         # reference.
         weak_self = weakref.ref(self)
-        self.sensor.listen(lambda event: LaneInvasionSensor._on_invasion(weak_self, event, world))
+        self.sensor.listen(lambda event: LaneInvasionSensor._on_invasion(weak_self, event, world_obj))
 
     @staticmethod
-    def _on_invasion(weak_self, event, world):
+    def _on_invasion(weak_self, event, world_obj):
         self = weak_self()
         if not self:
             return
         lane_types = set(x.type for x in event.crossed_lane_markings)
         text = ['%r' % str(x).split()[-1] for x in lane_types]
         self.hud.notification('Crossed line %s' % ' and '.join(text))
-        if text == 'Solid' or text == 'SolidSolid':
-            world._autopilot_enabled = True
+        print(text)
+        if "'Solid'" in text or "'SolidSolid'" in text:
+            print('crossed')
+            world_obj._autopilot_enabled = True
 
 
 # ==============================================================================
