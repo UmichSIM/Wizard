@@ -232,7 +232,7 @@ class DualControl(object):
         self._joystick.init()
 
         self._parser = ConfigParser()
-        self._parser.read(r'C:\Users\Eric Landgraf\Default\Umich\UMTRI\Wizard\CARLA_0.9.9.2-W\wheel_config.ini')
+        # self._parser.read(r'C:\Users\Eric Landgraf\Default\Umich\UMTRI\Wizard\CARLA_0.9.9.2-W\wheel_config.ini')
         #self._parser.read('wheel_config.ini')
         self._steer_idx = int(
             self._parser.get('G29 Racing Wheel', 'steering_wheel'))
