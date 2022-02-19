@@ -9,6 +9,10 @@ from linux.carla.CameraManager import CameraManager
 
 
 class World(object):
+    """
+    Carla world object
+    """
+    __instance = None
     def __init__(self, carla_world, hud, actor_filter):
         self.world = carla_world
         self.hud = hud
@@ -18,20 +22,32 @@ class World(object):
         self.gnss_sensor = None
         self.imu_sensor = None
         self.camera_manager = None
-        self._weather_presets = find_weather_presets()
-        self._weather_index = 0
-        self._actor_filter = actor_filter
+        self.__weather_presets = find_weather_presets()
+        self.__weather_index = 0
+        self.__actor_filter = actor_filter
+        # list of actors to be destroyed
+        self.__destroy_actors:list = []
         self.restart()
         self.world.on_tick(hud.on_world_tick)
-        # Wizard
-        self.driver = "TODO"
+        # Singleton check
+        if World.__instance is None:
+            World.__instance = self
+        else:
+            raise Exception("Class World is a singleton")
+
+
+    @staticmethod
+    def get_instance():
+        if World.__instance is None:
+            raise Exception("Class World not initialized")
+        return World.__instance
 
     def restart(self):
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
         # Get a random blueprint.
-        blueprint = random.choice(self.world.get_blueprint_library().filter(self._actor_filter))
+        blueprint = random.choice(self.world.get_blueprint_library().filter(self.__actor_filter))
         blueprint.set_attribute('role_name', 'hero')
         if blueprint.has_attribute('color'):
             color = random.choice(blueprint.get_attribute('color').recommended_values)
@@ -60,10 +76,11 @@ class World(object):
         self.hud.notification(actor_type)
 
     def next_weather(self, reverse=False):
-        self._weather_index += -1 if reverse else 1
-        self._weather_index %= len(self._weather_presets)
-        preset = self._weather_presets[self._weather_index]
+        self.__weather_index += -1 if reverse else 1
+        self.__weather_index %= len(self.__weather_presets)
+        preset = self.__weather_presets[self.__weather_index]
         self.hud.notification('Weather: %s' % preset[1])
+        # TODO: Check whether self.world can be used
         self.player.get_world().set_weather(preset[0])
 
     def tick(self, clock):
