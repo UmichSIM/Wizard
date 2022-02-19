@@ -64,6 +64,7 @@ class World(object):
             spawn_points = self.world.get_map().get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
+            self.register_death(self.player) # register death
             # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.player, self.hud)
         self.lane_invasion_sensor = LaneInvasionSensor(self.player, self.hud)
@@ -90,14 +91,16 @@ class World(object):
         self.camera_manager.render(display)
         self.hud.render(display)
 
+
+    def register_death(self,actor):
+        """ Register the actors to be destroyed, actor should have destroy method"""
+        self.__destroy_actors.append(actor)
+
+
     def destroy(self):
-        actors = [
-            self.camera_manager.sensor,
-            self.collision_sensor.sensor,
-            self.lane_invasion_sensor.sensor,
-            self.gnss_sensor.sensor,
-            self.imu_sensor.sensor,
-            self.player]
-        for actor in actors:
+        for actor in self.__destroy_actors:
             if actor is not None:
-                actor.destroy()
+                try:
+                    actor.destroy()
+                except NameError:
+                    print("actor does not have destroy method!")

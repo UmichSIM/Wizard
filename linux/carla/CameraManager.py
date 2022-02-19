@@ -7,6 +7,7 @@ import os
 import time
 import pygame
 import config
+from linux.world import World
 
 class CameraManager:
     """
@@ -63,6 +64,7 @@ class CameraManager:
                 self.sensors[index][-1],
                 self._camera_transforms[self.transform_index],
                 attach_to=self._parent)
+            World.get_instance().register_death(self.sensor)
             # We need to pass the lambda a weak reference to self to avoid
             # circular reference.
             weak_self = weakref.ref(self)

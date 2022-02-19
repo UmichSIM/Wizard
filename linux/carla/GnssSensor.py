@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import carla
 import weakref
+from linux.world import World
 
 class GnssSensor(object):
     """
@@ -14,6 +15,7 @@ class GnssSensor(object):
         world = self._parent.get_world()
         bp = world.get_blueprint_library().find('sensor.other.gnss')
         self.sensor = world.spawn_actor(bp, carla.Transform(carla.Location(x=1.0, z=2.8)), attach_to=self._parent)
+        World.get_instance().register_death(self.sensor)
         # We need to pass the lambda a weak reference to self to avoid circular
         # reference.
         weak_self = weakref.ref(self)
