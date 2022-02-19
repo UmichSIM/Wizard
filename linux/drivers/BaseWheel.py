@@ -2,6 +2,9 @@
 from evdev import ecodes
 import math
 from abc import ABC
+from linux.world import World
+from linux.utils.map import LinearMap
+
 
 class BaseWheel(ABC):
     """
@@ -15,24 +18,33 @@ class BaseWheel(ABC):
                       ev_key_event,
                       None,
                       ev_abs_event]
+    # settings
+    steer_max:int = 65535 # max possible value to steering wheel
+    pedal_max:int = 255 # max possible value of pedals
     def __init__(self):
         # register events
         # evdev device
         self.ev = None
-        self.ev_name:str = ""
+        self.name:str = ""
+        # data
+        self.steer_val:int = 0 # steer input [0,65535]
+        self.acc_val:int = 0 # accelarator input [0,255]
+        self.brake_val:int = 0 # brake input [0,255]
+        self.clutch_val:int = 0 # clutch input [0,255]
 
-    def __init(self):
-        assert(self.ev.name == self.ev_name) # check device name
+
+    def _init(self):
         # init with 0.75 autocenter force
-        self.__setFF(ecodes.FF_AUTOCENTER, 0.75)
+        self._setFF(ecodes.FF_AUTOCENTER, 0.75)
         print("Racing wheel registered")
 
 
-    def SetAutoCenter(self,world):
+    def SetAutoCenter(self):
         '''
         Update the auto center force feedback using speed
         '''
-        v = world.player.get_velocity()
+        world = World.get_instance()
+        v = world.vehicle.get_velocity()
         speed = (3.6 * math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2))
 
         # speed limit that influences the autocenter
@@ -43,7 +55,7 @@ class BaseWheel(ABC):
         autocenterCmd:float = math.sin(speed/S2W_THRESHOLD)
 
         # send autocenterCmd to the steeringwheel
-        self.__setFF(ecodes.FF_AUTOCENTER, autocenterCmd)
+        self._setFF(ecodes.FF_AUTOCENTER, autocenterCmd)
 
 
     async def events_handler(self) -> None:
@@ -58,7 +70,7 @@ class BaseWheel(ABC):
                 raise Exception(
                     "No handler for code {0} in type {1}".format(event.code, event.type))
 
-    def __setFF(self,ff_type:int, val:float) -> None:
+    def _setFF(self,ff_type:int, val:float) -> None:
         """
         Set the force feedback
 
@@ -76,85 +88,85 @@ class BaseWheel(ABC):
         self.ev.write(ecodes.EV_FF, ff_type, int(65535*val))
 
 
-    def __key_xbox_handler(self,event):
+    def _key_xbox_handler(self,event):
         pass
 
 
-    def __key_lsb_handler(self,event):
+    def _key_lsb_handler(self,event):
         pass
 
 
-    def __key_rsb_handler(self,event):
+    def _key_rsb_handler(self,event):
         pass
 
 
-    def __key_view_handler(self,event):
+    def _key_view_handler(self,event):
         pass
 
 
-    def __key_menu_handler(self,event):
+    def _key_menu_handler(self,event):
         pass
 
 
-    def __key_a_handler(self,event):
+    def _key_a_handler(self,event):
         pass
 
 
-    def __key_b_handler(self,event):
+    def _key_b_handler(self,event):
         pass
 
 
-    def __key_x_handler(self,event):
+    def _key_x_handler(self,event):
         pass
 
 
-    def __key_y_handler(self,event):
+    def _key_y_handler(self,event):
         pass
 
 
-    def __key_lshift_handler(self,event):
+    def _key_lshift_handler(self,event):
         """
         handler for left paddle shift on G920
         """
         pass
 
 
-    def __key_rshift_handler(self,event):
+    def _key_rshift_handler(self,event):
         """
         handler for right paddle shift on G920
         """
         pass
 
 
-    def __abs__steer_handler(self,event):
+    def _abs__steer_handler(self,event):
         """
         handler for the steering wheel input on G920
         """
-        pass
+        self.steer_val = event.value
 
 
-    def __abs_acc_handler(self,event):
+    def _abs_acc_handler(self,event):
         """
         handler for the accelerator input
         """
-        pass
+        self.acc_val = event.value
 
 
-    def __abs_brake_handler(self,event):
+    def _abs_brake_handler(self,event):
         """
         handler for the brake input
         """
-        pass
+        self.brake_val = event.value
 
 
-    def __abs_clutch_handler(self,event):
+    def _abs_clutch_handler(self,event):
         """
         handler for the clutch input
         """
-        pass
+        self.clutch_val = event.value
 
 
-    def __abs_pad_handler(self,event):
+    def _abs_pad_handler(self,event):
         """
         handler for the directional pad
         c:16 val:-1 -> left
@@ -165,7 +177,18 @@ class BaseWheel(ABC):
         pass
 
 
-    def __sync_event_handler(self, event):
+    @classmethod
+    def SteerMap(cls,val:int):
         """
-        handler for sync event
+        map the input of steering wheel to carla defined region [-1,1]
         """
+        return LinearMap(val,cls.steer_max)
+
+
+    @classmethod
+    def PedalMap(cls,val:int):
+        """
+        map the input of pedals to carla defined region [0,1]
+        """
+        # reverse the input because 255 is 0 in evdev
+        return LinearMap(cls.steer_max - val,cls.steer_max)
