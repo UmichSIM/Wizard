@@ -6,6 +6,7 @@ from linux.carla.LaneInvasionSensor import LaneInvasionSensor
 from linux.carla.GnssSensor import GnssSensor
 from linux.carla.IMUSensor import IMUSensor
 from linux.carla.CameraManager import CameraManager
+from linux.drivers.inputs import InputPacket
 
 
 class World(object):
@@ -16,7 +17,7 @@ class World(object):
     def __init__(self, carla_world, hud, actor_filter):
         self.world = carla_world
         self.hud = hud
-        self.player = None
+        self.vehicle = None
         self.collision_sensor = None
         self.lane_invasion_sensor = None
         self.gnss_sensor = None
@@ -33,7 +34,7 @@ class World(object):
         if World.__instance is None:
             World.__instance = self
         else:
-            raise Exception("Class World is a singleton")
+            raise Exception("Error: Reinitialization of World")
 
 
     @staticmethod
@@ -42,7 +43,7 @@ class World(object):
             raise Exception("Class World not initialized")
         return World.__instance
 
-    def restart(self):
+    def restart(self, data=None):
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
@@ -52,37 +53,38 @@ class World(object):
         if blueprint.has_attribute('color'):
             color = random.choice(blueprint.get_attribute('color').recommended_values)
             blueprint.set_attribute('color', color)
-            # Spawn the player.
-        if self.player is not None:
-            spawn_point = self.player.get_transform()
+        # Spawn the vehicle.
+        if self.vehicle is not None:
+            spawn_point = self.vehicle.get_transform()
             spawn_point.location.z += 2.0
             spawn_point.rotation.roll = 0.0
             spawn_point.rotation.pitch = 0.0
             self.destroy()
-            self.player = self.world.try_spawn_actor(blueprint, spawn_point)
-        while self.player is None:
+            self.vehicle = self.world.try_spawn_actor(blueprint, spawn_point)
+        while self.vehicle is None:
             spawn_points = self.world.get_map().get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
-            self.player = self.world.try_spawn_actor(blueprint, spawn_point)
-            self.register_death(self.player) # register death
+            self.vehicle = self.world.try_spawn_actor(blueprint, spawn_point)
+            self.register_death(self.vehicle) # register death
+        assert(isinstance(self.vehicle, carla.Vehicle))
             # Set up the sensors.
-        self.collision_sensor = CollisionSensor(self.player, self.hud)
-        self.lane_invasion_sensor = LaneInvasionSensor(self.player, self.hud)
-        self.gnss_sensor = GnssSensor(self.player)
-        self.imu_sensor = IMUSensor(self.player) #new
-        self.camera_manager = CameraManager(self.player, self.hud)
+        self.collision_sensor = CollisionSensor(self.vehicle, self.hud)
+        self.lane_invasion_sensor = LaneInvasionSensor(self.vehicle, self.hud)
+        self.gnss_sensor = GnssSensor(self.vehicle)
+        self.imu_sensor = IMUSensor(self.vehicle) #new
+        self.camera_manager = CameraManager(self.vehicle, self.hud)
         self.camera_manager.transform_index = cam_pos_index
         self.camera_manager.set_sensor(cam_index, notify=False)
-        actor_type = get_actor_display_name(self.player)
+        actor_type = get_actor_display_name(self.vehicle)
         self.hud.notification(actor_type)
 
-    def next_weather(self, reverse=False):
+    def next_weather(self, data:InputPacket,reverse=False):
         self.__weather_index += -1 if reverse else 1
         self.__weather_index %= len(self.__weather_presets)
         preset = self.__weather_presets[self.__weather_index]
         self.hud.notification('Weather: %s' % preset[1])
         # TODO: Check whether self.world can be used
-        self.player.get_world().set_weather(preset[0])
+        self.vehicle.get_world().set_weather(preset[0])
 
     def tick(self, clock):
         self.hud.tick(self, clock)
