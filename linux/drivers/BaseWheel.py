@@ -4,6 +4,8 @@ import math
 from abc import ABC
 from linux.world import World
 from linux.utils.map import LinearMap
+from linux.controller import Controller
+from linux.drivers.inputs import InputDevType,InputEventType, WheelKeyType
 
 
 class BaseWheel(ABC):
@@ -11,26 +13,31 @@ class BaseWheel(ABC):
     Abstract wheel class to be inherited
     """
     # static variables
-    ev_key_event:dict = {}
-    ev_abs_event:dict = {}
+    ev_key_map:dict = {}
+    ev_abs_map:dict = {}
+    # 1 for key type and 3 for abs type
+    ev_events:list = [
+        None, ev_key_map, None, ev_abs_map
+    ]
     ev_type_accepted:tuple = (1,3)
-    ev_events:list = [None,
-                      ev_key_event,
-                      None,
-                      ev_abs_event]
     # settings
     steer_max:int = 65535 # max possible value to steering wheel
     pedal_max:int = 255 # max possible value of pedals
-    def __init__(self):
-        # register events
+
+
+    def __init__(self, dev_type:InputDevType = InputDevType.WHEEL):
+        # type
+        self.dev_type:InputDevType = dev_type
         # evdev device
-        self.ev = None
-        self.name:str = ""
+        self._ev = None
+        self._ctl_key_map:dict = {}
         # data
         self.steer_val:int = 0 # steer input [0,65535]
         self.acc_val:int = 0 # accelarator input [0,255]
         self.brake_val:int = 0 # brake input [0,255]
         self.clutch_val:int = 0 # clutch input [0,255]
+        # references
+        self._controller = Controller.get_instance()
 
 
     def _init(self):
@@ -62,13 +69,13 @@ class BaseWheel(ABC):
         '''
         Capture and handle events using asyncio
         '''
-        async for event in self.ev.async_read_loop():
-            try:
-                if event.type in self.ev_type_accepted:
-                    self.ev_events[event.type][event.code](event)
-            except:
-                raise Exception(
-                    "No handler for code {0} in type {1}".format(event.code, event.type))
+        async for event in self._ev.async_read_loop():
+            if event.type in self.ev_type_accepted:
+                key_type:WheelKeyType = self.ev_events[event.type].get(event.code)
+                event_type:InputEventType = self._ctl_key_map.get(key_type)
+                if event_type is not None:
+                    self._controller.register_event(event_type,
+                                                    self.dev_type,event.value)
 
     def _setFF(self,ff_type:int, val:float) -> None:
         """
@@ -85,96 +92,7 @@ class BaseWheel(ABC):
         - val: float ranging from [0,1]
         """
         assert(val >= 0 and val <= 1)
-        self.ev.write(ecodes.EV_FF, ff_type, int(65535*val))
-
-
-    def _key_xbox_handler(self,event):
-        pass
-
-
-    def _key_lsb_handler(self,event):
-        pass
-
-
-    def _key_rsb_handler(self,event):
-        pass
-
-
-    def _key_view_handler(self,event):
-        pass
-
-
-    def _key_menu_handler(self,event):
-        pass
-
-
-    def _key_a_handler(self,event):
-        pass
-
-
-    def _key_b_handler(self,event):
-        pass
-
-
-    def _key_x_handler(self,event):
-        pass
-
-
-    def _key_y_handler(self,event):
-        pass
-
-
-    def _key_lshift_handler(self,event):
-        """
-        handler for left paddle shift on G920
-        """
-        pass
-
-
-    def _key_rshift_handler(self,event):
-        """
-        handler for right paddle shift on G920
-        """
-        pass
-
-
-    def _abs__steer_handler(self,event):
-        """
-        handler for the steering wheel input on G920
-        """
-        self.steer_val = event.value
-
-
-    def _abs_acc_handler(self,event):
-        """
-        handler for the accelerator input
-        """
-        self.acc_val = event.value
-
-
-    def _abs_brake_handler(self,event):
-        """
-        handler for the brake input
-        """
-        self.brake_val = event.value
-
-
-    def _abs_clutch_handler(self,event):
-        """
-        handler for the clutch input
-        """
-        self.clutch_val = event.value
-
-
-    def _abs_pad_handler(self,event):
-        """
-        handler for the directional pad
-        c:16 val:-1 -> left
-        c:16 val:1 -> right
-        c:17 val:-1 -> up
-        c:17 val:1 -> down
-        """
-        pass
+        self._ev.write(ecodes.EV_FF, ff_type, int(65535*val))
 
 
     @classmethod

@@ -4,39 +4,43 @@ import asyncio
 from evdev import ecodes, InputDevice, ff
 import config
 from linux.drivers.BaseWheel import BaseWheel
+from linux.drivers.inputs import InputDevType, WheelKeyType
 
 class G920(BaseWheel):
-    def __init__(self,ev_name):
-        self.ev_name = ev_name
-        # register events
-        self.ev_key_event  = {
-            288:self._key_a_handler,
-            289:self._key_b_handler,
-            290:self._key_x_handler,
-            291:self._key_y_handler,
-            292:self._key_rshift_handler,
-            293:self._key_lshift_handler,
-            294:self._key_menu_handler,
-            295:self._key_view_handler,
-            296:self._key_rsb_handler,
-            297:self._key_lsb_handler,
-            298:self._key_xbox_handler,
-        }
-        self.ev_abs_event  = {
-            0: self._abs__steer_handler,
-            1: self._abs_acc_handler,
-            2: self._abs_brake_handler,
-            5: self._abs_clutch_handler,
-            16: self._abs_pad_handler,
-            17: self._abs_pad_handler,
-        }
+    # register keymap
+    ev_key_map = {
+        288: WheelKeyType.A,
+        289: WheelKeyType.B,
+        290: WheelKeyType.X,
+        291: WheelKeyType.Y,
+        292: WheelKeyType.RSHIFT,
+        293: WheelKeyType.LSHIFT,
+        294: WheelKeyType.MENU,
+        295: WheelKeyType.VIEW,
+        296: WheelKeyType.RSB,
+        297: WheelKeyType.LSB,
+        298: WheelKeyType.XBOX,
+    }
+    ev_abs_map = {
+        0: WheelKeyType.STEER,
+        1: WheelKeyType.ACC,
+        2: WheelKeyType.BRAKE,
+        5: WheelKeyType.CLUTCH,
+        16: WheelKeyType.HPAD,
+        17: WheelKeyType.VPAD
+    }
+    def __init__(self, dev_type:InputDevType):
+        # super class
+        super().__init__(dev_type)
+        # give control key map
+        self._ctl_key_map = config.wheel1_key_map
         # TODO: Change connection type
         self.ev:evdev.InputDevice = InputDevice(evdev.list_devices()[0])
         self._init()
 
 
 if __name__ == "__main__":
-    rw = G920(config.wheel1_name)
+    rw = G920(InputDevType.WHEEL)
     asyncio.ensure_future(rw.events_handler())
     loop = asyncio.get_event_loop()
     loop.run_forever()
