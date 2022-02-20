@@ -5,6 +5,7 @@ from linux.hud import HUD
 from linux.drivers.G920 import G920
 from linux.drivers.inputs import InputEventType, InputDevType, InputPacket
 from asyncio import Queue
+import asyncio
 import linux.config as config
 
 
@@ -14,9 +15,13 @@ class Controller:
     """
     __instance = None
     def __init__(self):
-        # References
+        # objects and references
         self.__world = World.get_instance()
         self.__hud = HUD.get_instance()
+        # Racing wheel registration
+        self.wheel = G920(InputDevType.WHEEL)
+        asyncio.ensure_future(self.wheel.events_handler())
+        asyncio.get_event_loop().run_forever()
         # TODO: merge vehicle and vehicle_ctl
         self.__vehicle = self.__world.vehicle
         self.__vehicle_ctl = carla.VehicleControl()
