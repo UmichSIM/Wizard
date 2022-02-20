@@ -86,6 +86,7 @@ class HUD(object):
     def get_instance():
         if HUD.__instance is None:
             raise Exception("Error: Class HUD not initialized")
+        return HUD.__instance
 
     def on_world_tick(self, timestamp):
         self._server_clock.tick()
