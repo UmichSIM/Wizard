@@ -383,7 +383,7 @@ class DualControl(object):
 
         numAxes = self._joystick.get_numaxes()
         jsInputs = [float(self._joystick.get_axis(i)) for i in range(numAxes)]
-        print (jsInputs)
+        # print (jsInputs)
         jsButtons = [float(self._joystick.get_button(i)) for i in
                      range(self._joystick.get_numbuttons())]
 
@@ -428,9 +428,10 @@ class DualControl(object):
         # elif brakeCmd > 1:
         #     brakeCmd = 1
 
-        print (throttleCmd)
-        print (brakeCmd)
+        # print (throttleCmd)
+        # print (brakeCmd)
 
+        print(steerCmd)
         self._control.steer = steerCmd
         self._control.brake = brakeCmd
         self._control.throttle = throttleCmd

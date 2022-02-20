@@ -6,6 +6,7 @@ import math
 # TODO: change dirname
 from linux.world import World
 from linux.helper import *
+
 class CollisionSensor:
     """
     Sensor to get the car collision data with the environment

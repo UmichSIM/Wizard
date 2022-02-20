@@ -6,7 +6,9 @@ from linux.drivers.G920 import G920
 from linux.drivers.inputs import InputEventType, InputDevType, InputPacket
 from asyncio import Queue
 import asyncio
+import threading
 import linux.config as config
+import carla
 
 
 class Controller:
@@ -15,16 +17,25 @@ class Controller:
     """
     __instance = None
     def __init__(self):
+        # singleton
+        if Controller.__instance is None:
+            Controller.__instance = self
+        else:
+            raise Exception("Error: Reinitialization of Controller")
         # objects and references
         self.__world = World.get_instance()
         self.__hud = HUD.get_instance()
         # Racing wheel registration
         self.wheel = G920(InputDevType.WHEEL)
-        asyncio.ensure_future(self.wheel.events_handler())
-        asyncio.get_event_loop().run_forever()
+        # self.wheel.events_handler()
+        self.t1 = threading.Thread(target=self.wheel.events_handler)
+        self.t1.start()
+        # asyncio.get_event_loop().run_until_complete(self.wheel.events_handler())
+
         # TODO: merge vehicle and vehicle_ctl
         self.__vehicle = self.__world.vehicle
-        self.__vehicle_ctl = carla.VehicleControl()
+        self.__vehicle_ctl = self.__vehicle.get_control()
+        print(self.__vehicle_ctl.steer)
         # vars
         self.__autopilot:bool = config.autopilot_enabled
         # events handling
@@ -43,17 +54,13 @@ class Controller:
             self.__update_steer_input, # Steer
             lambda data: None, # Clutch
         ]
-        # singleton
-        if Controller.__instance is None:
-            Controller.__instance = self
-        else:
-            raise Exception("Error: Reinitialization of Controller")
+        
 
 
     @staticmethod
     def get_instance():
         if Controller.__instance is None:
-            raise Exception("Error: Class Controller not initialized")
+            Controller.__instance = Controller()
         return Controller.__instance
 
 
@@ -78,6 +85,8 @@ class Controller:
         while not self.__eventsq.empty():
             pac:InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
+        self.__vehicle.apply_control(self.__vehicle_ctl)
+        self.wheel.SetAutoCenter()
 
 
     def __update_steer_input(self,data:InputPacket):
@@ -85,6 +94,7 @@ class Controller:
                                                 else InputDevType.WHEEL
         if data.dev == driver:
             self.__vehicle_ctl.steer = G920.SteerMap(data.val)
+            print(self.__vehicle_ctl.steer)
 
 
     def __update_brake_input(self, data:InputPacket):

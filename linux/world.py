@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 from helper import *
 import random
-from linux.sensors.CollisionSensor import CollisionSensor
-from linux.sensors.LaneInvasionSensor import LaneInvasionSensor
-from linux.sensors.GnssSensor import GnssSensor
-from linux.sensors.IMUSensor import IMUSensor
-from linux.sensors.CameraManager import CameraManager
 
 
 class World(object):
@@ -14,6 +9,11 @@ class World(object):
     """
     __instance = None
     def __init__(self, carla_world, hud, actor_filter):
+        # Singleton check
+        if World.__instance is None:
+            World.__instance = self
+        else:
+            raise Exception("Error: Reinitialization of World")
         self.world = carla_world
         self.hud = hud
         self.vehicle = None
@@ -29,11 +29,6 @@ class World(object):
         self.__destroy_actors:list = []
         self.restart()
         self.world.on_tick(hud.on_world_tick)
-        # Singleton check
-        if World.__instance is None:
-            World.__instance = self
-        else:
-            raise Exception("Error: Reinitialization of World")
 
 
     @staticmethod
@@ -43,6 +38,11 @@ class World(object):
         return World.__instance
 
     def restart(self):
+        from linux.sensors.CollisionSensor import CollisionSensor
+        from linux.sensors.LaneInvasionSensor import LaneInvasionSensor
+        from linux.sensors.GnssSensor import GnssSensor
+        from linux.sensors.IMUSensor import IMUSensor
+        from linux.sensors.CameraManager import CameraManager
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
@@ -64,6 +64,7 @@ class World(object):
             spawn_points = self.world.get_map().get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.vehicle = self.world.try_spawn_actor(blueprint, spawn_point)
+            self.ctl = self.vehicle.get_control()
             self.register_death(self.vehicle) # register death
         assert(isinstance(self.vehicle, carla.Vehicle))
             # Set up the sensors.

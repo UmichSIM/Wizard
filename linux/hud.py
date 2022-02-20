@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""
+Welcome to CARLA manual control with steering wheel Logitech G29.
+To drive start by preshing the brake pedal.
+Change your wheel_config.ini according to your steering wheel.
+To find out the values of your steering wheel use jstest-gtk in Ubuntu.
+"""
 import pygame
 import os
 import carla
@@ -110,7 +116,8 @@ class HUD(object):
         max_col = max(1.0, max(collision))
         collision = [x / max_col for x in collision]
         vehicles = world.world.get_actors().filter('vehicle.*')
-        driver = world.driver
+        # TODO: change this
+        driver = "Driver"
 
         self._info_text = [
             'Driver: % 20s' % driver,

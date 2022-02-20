@@ -4,7 +4,6 @@ import math
 from abc import ABC
 from linux.world import World
 from linux.utils.map import LinearMap
-from linux.controller import Controller
 from linux.drivers.inputs import InputDevType,InputEventType, WheelKeyType
 
 
@@ -12,20 +11,20 @@ class BaseWheel(ABC):
     """
     Abstract wheel class to be inherited
     """
-    # static variables
-    ev_key_map:dict = {}
-    ev_abs_map:dict = {}
-    # 1 for key type and 3 for abs type
-    ev_events:list = [
-        None, ev_key_map, None, ev_abs_map
-    ]
-    ev_type_accepted:tuple = (1,3)
+    
     # settings
     steer_max:int = 65535 # max possible value to steering wheel
     pedal_max:int = 255 # max possible value of pedals
-
-
     def __init__(self, dev_type:InputDevType = InputDevType.WHEEL):
+        from linux.controller import Controller
+        # static variables
+        self.ev_key_map:dict = {}
+        self.ev_abs_map:dict = {}
+        # 1 for key type and 3 for abs type
+        self.ev_events:list = [
+    ]
+        self.ev_type_accepted:tuple = (1,3)
+        
         # type
         self.dev_type:InputDevType = dev_type
         # evdev device
@@ -65,15 +64,15 @@ class BaseWheel(ABC):
         self._setFF(ecodes.FF_AUTOCENTER, autocenterCmd)
 
 
-    async def events_handler(self) -> None:
+    def events_handler(self) -> None:
         '''
-        Capture and handle events using asyncio
+        Capture and handle events
         '''
-        async for event in self._ev.async_read_loop():
+        for event in self._ev.read_loop():
             if event.type in self.ev_type_accepted:
                 key_type:WheelKeyType = self.ev_events[event.type].get(event.code)
-                event_type:InputEventType = self._ctl_key_map.get(key_type)
-                if event_type is not None:
+                event_type:InputEventType = self._ctl_key_map.get(key_type, InputEventType.NONE)
+                if event_type is not InputEventType.NONE:
                     self._controller.register_event(event_type,
                                                     self.dev_type,event.value)
 
@@ -100,7 +99,7 @@ class BaseWheel(ABC):
         """
         map the input of steering wheel to carla defined region [-1,1]
         """
-        return LinearMap(val,cls.steer_max)
+        return LinearMap(val,cls.steer_max)*2-1
 
 
     @classmethod
@@ -109,4 +108,4 @@ class BaseWheel(ABC):
         map the input of pedals to carla defined region [0,1]
         """
         # reverse the input because 255 is 0 in evdev
-        return LinearMap(cls.steer_max - val,cls.steer_max)
+        return LinearMap(cls.pedal_max - val,cls.pedal_max)
