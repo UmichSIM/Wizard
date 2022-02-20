@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 from helper import *
 import random
-from linux.carla.CollisionSensor import CollisionSensor
-from linux.carla.LaneInvasionSensor import LaneInvasionSensor
-from linux.carla.GnssSensor import GnssSensor
-from linux.carla.IMUSensor import IMUSensor
-from linux.carla.CameraManager import CameraManager
-from linux.drivers.inputs import InputPacket
+from linux.sensors.CollisionSensor import CollisionSensor
+from linux.sensors.LaneInvasionSensor import LaneInvasionSensor
+from linux.sensors.GnssSensor import GnssSensor
+from linux.sensors.IMUSensor import IMUSensor
+from linux.sensors.CameraManager import CameraManager
 
 
 class World(object):
