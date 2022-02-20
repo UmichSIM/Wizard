@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass
-from enum import IntEnum
+from enum import IntEnum, auto
 
 class InputEventType(IntEnum):
     """
     Enum indicating the event requested for controller to handle
     """
-    CHANGE_WEATHER = 0,
-    RESTART_WORLD = 1,
-    TOGGLE_INFO = 2,
-    TOGGLE_CAMERA = 3,
-    TOGGLE_SENSOR = 4,
-    REVERSE_GEAR = 5,
-    TOGGLE_HELP = 6,
-    ACCELERATOR = 7,
-    BREAK = 8,
-    STEER = 9,
-    CLUTCH = 10
+    CHANGE_WEATHER = 0
+    RESTART_WORLD = auto()
+    TOGGLE_INFO = auto()
+    TOGGLE_CAMERA = auto()
+    TOGGLE_SENSOR = auto()
+    TOGGLE_HELP = auto()
+    DEC_GEAR = auto()
+    INC_GEAR = auto()
+    ACCELERATOR = auto()
+    BRAKE = auto()
+    STEER = auto()
+    CLUTCH = auto()
+    NONE = auto() # do nothing
 
 
 class InputDevType(IntEnum):
