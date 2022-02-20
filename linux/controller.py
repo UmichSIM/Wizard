@@ -27,12 +27,12 @@ class Controller:
         self.__event_handlers:list = [
             lambda data: self.__world.next_weather(), # change weather
             lambda data: self.__world.restart(), # restart world
-            None, # toggle info
-            None, # toggle camera
-            None, # toggle sensor
-            None, # toggle help
-            lambda data: None, # Decrease Gear
-            lambda data: None, # Increate Gear
+            lambda data: self.__hud.toggle_info(), # toggle info
+            lambda data: self.__world.camera_manager.toggle_camera(), # toggle camera
+            lambda data: self.__world.camera_manager.next_sensor(), # toggle sensor
+            lambda data: self.__hud.help.toggle(), # toggle help
+            self.__decrease_gear, # Decrease Gear
+            self.__increase_gear, # Increate Gear
             self.__update_acc_input, # accelerator
             self.__update_brake_input, # Break
             self.__update_steer_input, # Steer
@@ -90,3 +90,16 @@ class Controller:
         self.__vehicle_ctl.throttle = G920.PedalMap(data.val)
 
 
+    def __decrease_gear(self, data:InputPacket):
+        """
+        Decrease the gear of the vehicle
+        TODO: move to vehicle class
+        """
+        self.__vehicle_ctl.reverse = True
+
+    def __increase_gear(self, data:InputPacket):
+        """
+        Increase the gear of the vehicle
+        TODO: move to vehicle class
+        """
+        self.__vehicle_ctl.reverse = False
