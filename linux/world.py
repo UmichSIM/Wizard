@@ -43,7 +43,7 @@ class World(object):
             raise Exception("Class World not initialized")
         return World.__instance
 
-    def restart(self, data=None):
+    def restart(self):
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
@@ -78,7 +78,7 @@ class World(object):
         actor_type = get_actor_display_name(self.vehicle)
         self.hud.notification(actor_type)
 
-    def next_weather(self, data:InputPacket,reverse=False):
+    def next_weather(self, reverse=False):
         self.__weather_index += -1 if reverse else 1
         self.__weather_index %= len(self.__weather_presets)
         preset = self.__weather_presets[self.__weather_index]
