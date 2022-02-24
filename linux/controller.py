@@ -4,9 +4,8 @@ from linux.world import World
 from linux.hud import HUD
 from linux.drivers.G920 import G920
 from linux.drivers.inputs import InputEventType, InputDevType, InputPacket
-from asyncio import Queue
-import asyncio
-import threading
+from threading import Lock
+from queue import Queue
 import linux.config as config
 import carla
 
@@ -27,18 +26,15 @@ class Controller:
         self.__hud = HUD.get_instance()
         # Racing wheel registration
         self.wheel = G920(InputDevType.WHEEL)
-        # self.wheel.events_handler()
-        self.t1 = threading.Thread(target=self.wheel.events_handler)
-        self.t1.start()
-        # asyncio.get_event_loop().run_until_complete(self.wheel.events_handler())
+        self.wheel.start()
 
         # TODO: merge vehicle and vehicle_ctl
         self.__vehicle = self.__world.vehicle
         self.__vehicle_ctl = self.__vehicle.get_control()
-        print(self.__vehicle_ctl.steer)
         # vars
         self.__autopilot:bool = config.autopilot_enabled
         # events handling
+        self.__event_lock:Lock = Lock()
         self.__eventsq:Queue = Queue()
         self.__event_handlers:list = [
             lambda data: self.__world.next_weather(), # change weather
@@ -73,7 +69,8 @@ class Controller:
             dev: From which device
             val: Additional data field
         """
-        self.__eventsq.put_nowait(InputPacket(event_type,dev,val))
+        with self.__event_lock:
+            self.__eventsq.put_nowait(InputPacket(event_type,dev,val))
 
 
     def handle_events(self):
@@ -83,7 +80,8 @@ class Controller:
         # TODO: test whether this configuration works
         #       possible problem: event added while in loop, cause it not handled
         while not self.__eventsq.empty():
-            pac:InputPacket = self.__eventsq.get_nowait()
+            with self.__event_lock:
+                pac:InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
         self.__vehicle.apply_control(self.__vehicle_ctl)
         self.wheel.SetAutoCenter()

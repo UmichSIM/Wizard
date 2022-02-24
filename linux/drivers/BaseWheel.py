@@ -5,6 +5,7 @@ from abc import ABC
 from linux.world import World
 from linux.utils.map import LinearMap
 from linux.drivers.inputs import InputDevType,InputEventType, WheelKeyType
+import threading
 
 
 class BaseWheel(ABC):
@@ -24,7 +25,9 @@ class BaseWheel(ABC):
         self.ev_events:list = [
     ]
         self.ev_type_accepted:tuple = (1,3)
-        
+
+        # thread
+        self._thread =threading.Thread(target=self.events_handler)
         # type
         self.dev_type:InputDevType = dev_type
         # evdev device
@@ -63,6 +66,9 @@ class BaseWheel(ABC):
         # send autocenterCmd to the steeringwheel
         self._setFF(ecodes.FF_AUTOCENTER, autocenterCmd)
 
+
+    def start(self):
+        self._thread.start()
 
     def events_handler(self) -> None:
         '''
