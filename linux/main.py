@@ -6,6 +6,7 @@ from linux.helper import *
 from linux.world import World
 from linux.controller import Controller
 from linux.hud import HUD
+from linux import config
 
 def game_loop(args):
     pygame.init()
@@ -26,8 +27,8 @@ def game_loop(args):
 
         clock = pygame.time.Clock()
         while True:
-            clock.tick_busy_loop(60)
-            controller.handle_events()
+            clock.tick_busy_loop(config.client_frame_rate)
+            controller.tick()
             world.tick(clock)
             world.render(display)
             pygame.display.flip()

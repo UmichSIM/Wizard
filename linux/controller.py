@@ -73,6 +73,15 @@ class Controller:
             self.__eventsq.put_nowait(InputPacket(event_type,dev,val))
 
 
+    def tick(self):
+        """
+        Update all the stuffs in the main loop
+        """
+        self.handle_events()
+        self.__vehicle.apply_control(self.__vehicle_ctl)
+        self.wheel.SetAutoCenter()
+
+
     def handle_events(self):
         """
         Handle events registered in the previous loop
@@ -83,8 +92,6 @@ class Controller:
             with self.__event_lock:
                 pac:InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
-        self.__vehicle.apply_control(self.__vehicle_ctl)
-        self.wheel.SetAutoCenter()
 
 
     def __update_steer_input(self,data:InputPacket):

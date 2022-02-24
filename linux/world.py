@@ -38,11 +38,11 @@ class World(object):
         return World.__instance
 
     def restart(self):
-        from linux.sensors.CollisionSensor import CollisionSensor
-        from linux.sensors.LaneInvasionSensor import LaneInvasionSensor
-        from linux.sensors.GnssSensor import GnssSensor
-        from linux.sensors.IMUSensor import IMUSensor
-        from linux.sensors.CameraManager import CameraManager
+        from linux.carla_modules.CollisionSensor import CollisionSensor
+        from linux.carla_modules.LaneInvasionSensor import LaneInvasionSensor
+        from linux.carla_modules.GnssSensor import GnssSensor
+        from linux.carla_modules.IMUSensor import IMUSensor
+        from linux.carla_modules.CameraManager import CameraManager
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
