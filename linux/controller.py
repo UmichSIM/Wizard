@@ -4,6 +4,7 @@ from linux.world import World
 from linux.hud import HUD
 from linux.drivers.G920 import G920
 from linux.drivers.inputs import InputEventType, InputDevType, InputPacket
+from linux.carla_modules.vehicle import Vehicle
 from threading import Lock
 from queue import Queue
 import linux.config as config
@@ -28,11 +29,11 @@ class Controller:
         self.wheel = G920(InputDevType.WHEEL)
         self.wheel.start()
 
-        # TODO: merge vehicle and vehicle_ctl
-        self.__vehicle = self.__world.vehicle
-        self.__vehicle_ctl = self.__vehicle.get_control()
+        self.__vehicle:Vehicle = self.__world.vehicle
         # vars
-        self.__autopilot:bool = config.autopilot_enabled
+        self.driver:InputDevType = InputDevType.WIZARD if config.autopilot_enabled \
+                                                else InputDevType.WHEEL
+
         # events handling
         self.__event_lock:Lock = Lock()
         self.__eventsq:Queue = Queue()
@@ -43,10 +44,10 @@ class Controller:
             lambda data: self.__world.camera_manager.toggle_camera(), # toggle camera
             lambda data: self.__world.camera_manager.next_sensor(), # toggle sensor
             lambda data: self.__hud.help.toggle(), # toggle help
-            self.__decrease_gear, # Decrease Gear
-            self.__increase_gear, # Increate Gear
-            self.__update_acc_input, # accelerator
-            self.__update_brake_input, # Break
+            lambda data: self.__vehicle.set_reverse(False), # Decrease Gear
+            lambda data: self.__vehicle.set_reverse(True), # Increate Gear
+            lambda data: self.__vehicle.set_throttle(G920.PedalMap(data.val)), # Accelerator
+            lambda data: self.__vehicle.set_brake(G920.PedalMap(data.val)), # Brake
             self.__update_steer_input, # Steer
             lambda data: None, # Clutch
         ]
@@ -78,7 +79,7 @@ class Controller:
         Update all the stuffs in the main loop
         """
         self.handle_events()
-        self.__vehicle.apply_control(self.__vehicle_ctl)
+        self.__vehicle.update()
         self.wheel.SetAutoCenter()
 
 
@@ -95,31 +96,5 @@ class Controller:
 
 
     def __update_steer_input(self,data:InputPacket):
-        driver:InputDevType = InputDevType.WIZARD if self.__autopilot \
-                                                else InputDevType.WHEEL
-        if data.dev == driver:
-            self.__vehicle_ctl.steer = G920.SteerMap(data.val)
-            print(self.__vehicle_ctl.steer)
-
-
-    def __update_brake_input(self, data:InputPacket):
-        self.__vehicle_ctl.brake = G920.PedalMap(data.val)
-
-
-    def __update_acc_input(self, data:InputPacket):
-        self.__vehicle_ctl.throttle = G920.PedalMap(data.val)
-
-
-    def __decrease_gear(self, data:InputPacket):
-        """
-        Decrease the gear of the vehicle
-        TODO: move to vehicle class
-        """
-        self.__vehicle_ctl.reverse = True
-
-    def __increase_gear(self, data:InputPacket):
-        """
-        Increase the gear of the vehicle
-        TODO: move to vehicle class
-        """
-        self.__vehicle_ctl.reverse = False
+        if data.dev == self.driver:
+            self.__vehicle.set_steer(G920.SteerMap(data.val))

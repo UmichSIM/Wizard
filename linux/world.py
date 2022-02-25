@@ -43,6 +43,7 @@ class World(object):
         from linux.carla_modules.GnssSensor import GnssSensor
         from linux.carla_modules.IMUSensor import IMUSensor
         from linux.carla_modules.CameraManager import CameraManager
+        from linux.carla_modules.vehicle import Vehicle
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
@@ -59,14 +60,12 @@ class World(object):
             spawn_point.rotation.roll = 0.0
             spawn_point.rotation.pitch = 0.0
             self.destroy()
-            self.vehicle = self.world.try_spawn_actor(blueprint, spawn_point)
+            self.vehicle:Vehicle = Vehicle(blueprint,spawn_point)
         while self.vehicle is None:
             spawn_points = self.world.get_map().get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
-            self.vehicle = self.world.try_spawn_actor(blueprint, spawn_point)
-            self.ctl = self.vehicle.get_control()
+            self.vehicle:Vehicle = Vehicle(blueprint,spawn_point)
             self.register_death(self.vehicle) # register death
-        assert(isinstance(self.vehicle, carla.Vehicle))
             # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.vehicle, self.hud)
         self.lane_invasion_sensor = LaneInvasionSensor(self.vehicle, self.hud)
@@ -84,7 +83,7 @@ class World(object):
         preset = self.__weather_presets[self.__weather_index]
         self.hud.notification('Weather: %s' % preset[1])
         # TODO: Check whether self.world can be used
-        self.vehicle.get_world().set_weather(preset[0])
+        self.world.set_weather(preset[0])
 
     def tick(self, clock):
         self.hud.tick(self, clock)

@@ -3,7 +3,6 @@ import carla
 import weakref
 import collections
 import math
-# TODO: change dirname
 from linux.world import World
 from linux.helper import *
 
