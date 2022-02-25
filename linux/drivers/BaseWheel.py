@@ -4,7 +4,7 @@ import math
 from abc import ABC
 from linux.world import World
 from linux.utils.map import LinearMap
-from linux.drivers.inputs import InputDevType,InputEventType, WheelKeyType
+from linux.drivers.inputs import InputDevType,ControlEventType, WheelKeyType
 import threading
 
 
@@ -77,8 +77,8 @@ class BaseWheel(ABC):
         for event in self._ev.read_loop():
             if event.type in self.ev_type_accepted:
                 key_type:WheelKeyType = self.ev_events[event.type].get(event.code)
-                event_type:InputEventType = self._ctl_key_map.get(key_type, InputEventType.NONE)
-                if event_type is not InputEventType.NONE:
+                event_type:ControlEventType = self._ctl_key_map.get(key_type, ControlEventType.NONE)
+                if event_type is not ControlEventType.NONE:
                     self._controller.register_event(event_type,
                                                     self.dev_type,event.value)
 

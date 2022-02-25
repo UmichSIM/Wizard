@@ -3,12 +3,31 @@ from linux.helper import *
 from linux.world import World
 from linux.hud import HUD
 from linux.drivers.G920 import G920
-from linux.drivers.inputs import InputEventType, InputDevType, InputPacket
+from linux.drivers.inputs import ControlEventType, InputDevType, InputPacket
 from linux.carla_modules.vehicle import Vehicle
 from threading import Lock
 from queue import Queue
 import linux.config as config
+from enum import IntEnum, auto
 import carla
+
+class ControlEventType(IntEnum):
+    """
+    Enum indicating the event requested for controller to handle
+    """
+    CHANGE_WEATHER = 0
+    RESTART_WORLD = auto()
+    TOGGLE_INFO = auto()
+    TOGGLE_CAMERA = auto()
+    TOGGLE_SENSOR = auto()
+    TOGGLE_HELP = auto()
+    DEC_GEAR = auto()
+    INC_GEAR = auto()
+    ACCELERATOR = auto()
+    BRAKE = auto()
+    STEER = auto()
+    CLUTCH = auto()
+    NONE = auto() # do nothing
 
 
 class Controller:
@@ -58,7 +77,7 @@ class Controller:
         return Controller.__instance
 
 
-    def register_event(self,event_type:InputEventType,
+    def register_event(self,event_type:ControlEventType,
                        dev:InputDevType=InputDevType.KBD,val:int=0)->None:
         """
         Register the input event into the event queue
