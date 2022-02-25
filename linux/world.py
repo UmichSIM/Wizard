@@ -81,7 +81,6 @@ class World(object):
         self.__weather_index %= len(self.__weather_presets)
         preset = self.__weather_presets[self.__weather_index]
         self.hud.notification('Weather: %s' % preset[1])
-        # TODO: Check whether self.world can be used
         self.world.set_weather(preset[0])
 
     def render(self, display):

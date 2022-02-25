@@ -8,6 +8,7 @@ To find out the values of your steering wheel use jstest-gtk in Ubuntu.
 import pygame
 import os
 import carla
+from linux.carla_modules.vehicle import Vehicle
 from linux.helper import *
 import datetime
 import math
@@ -102,13 +103,15 @@ class HUD(object):
 
     def tick(self, clock):
         from linux.world import World
+        from linux.carla_modules.vehicle import Vehicle
         world:World = World.get_instance()
         self._notifications.tick(world, clock)
         if not self._show_info:
             return
-        t = world.vehicle.get_transform()
-        v = world.vehicle.get_velocity()
-        c = world.vehicle.get_control()
+        vehicle:Vehicle = Vehicle.get_instance()
+        t = vehicle.get_transform()
+        v = vehicle.get_velocity()
+        c = vehicle.get_control()
         heading = 'N' if abs(t.rotation.yaw) < 89.5 else ''
         heading += 'S' if abs(t.rotation.yaw) > 90.5 else ''
         heading += 'E' if 179.5 > t.rotation.yaw > 0.5 else ''
@@ -118,11 +121,9 @@ class HUD(object):
         max_col = max(1.0, max(collision))
         collision = [x / max_col for x in collision]
         vehicles = world.world.get_actors().filter('vehicle.*')
-        # TODO: change this
-        driver = "Driver"
 
         self._info_text = [
-            'Driver: % 20s' % driver,
+            'Driver: % 20s' % vehicle.get_driver_name(),
             'Server:  % 16.0f FPS' % self.server_fps,
             'Client:  % 16.0f FPS' % clock.get_fps(),
             '',

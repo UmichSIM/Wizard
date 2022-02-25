@@ -3,9 +3,21 @@ import carla
 from linux.drivers.inputs import InputDevType, InputPacket
 import linux.config as config
 from linux.config import UserWheel, WizardWheel
+
 class Vehicle:
+    """
+    Vehicle class is a wrapper for carla vehicle apis and is combined
+    with wizard switching functions. It also owns the drivers for the
+    racing wheels. The class is a singleton.
+    """
     __instance = None
     def __init__(self,blueprint, spawn_point):
+        """
+        Inputs:
+            blueprint: the model for the vehicle to use
+            spawn_point: initial transformation data of the vehicle
+        for more information on the input, refer to Carla API documents
+        """
         # Singleton
         if Vehicle.__instance is None:
             Vehicle.__instance = self
@@ -33,6 +45,7 @@ class Vehicle:
             raise Exception("Error: Class Vehicle not initialized")
         return Vehicle.__instance
 
+
     def change_vehicle(self, blueprint, spawn_point):
         "Using carla api to change the current vehicle"
         from linux.world import World
@@ -40,6 +53,7 @@ class Vehicle:
         self.vehicle:carla.Vehicle = \
             World.get_instance().world.try_spawn_actor(blueprint, spawn_point)
         self._ctl:carla.VehicleControl = self.vehicle.get_control()
+
 
     def switch_driver(self):
         "Switch the current driver, wizard should be enabled"
@@ -50,9 +64,15 @@ class Vehicle:
             self.driver = InputDevType.WHEEL
         self.DriverWheel = self.__get_driver_wheel()
 
+
     def get_transform(self):
         "from carla Vehicle api"
         return self.vehicle.get_transform()
+
+
+    def get_velocity(self):
+        "from carla Vehicle api"
+        return self.vehicle.get_velocity()
 
 
     def update(self):
@@ -73,7 +93,6 @@ class Vehicle:
         if data.dev == self.driver:
             self._ctl.throttle = self.DriverWheel.PedalMap(data.val)
 
-
     def set_steer(self,data:InputPacket):
         "set the vehicle steer value"
         if data.dev == self.driver:
@@ -86,8 +105,17 @@ class Vehicle:
             self._ctl.reverse = val
 
 
-    def get_control(self) -> carla.VehicleControl:
+    def get_control(self):
+        "From carla api"
         return self._ctl
+
+
+    def get_driver_name(self) -> str:
+        "Get the current driver as string"
+        if self.driver == InputDevType.WHEEL:
+            return "Human"
+        else:
+            return "Wizard"
 
 
     def __get_driver_wheel(self) -> type:

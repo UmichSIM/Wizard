@@ -9,6 +9,7 @@ cam_record_dir:str = "./_out"
 # Racing Wheel config
 wheel1_name = "Logitech G920 Driving Force Racing Wheel"
 enable_wizard:bool = False
+# The wheel model to use
 UserWheel:type = G920
 WizardWheel:type = G920
 user_key_map:dict = {
