@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from linux.drivers.inputs import ControlEventType, WheelKeyType
+from linux.drivers.inputs import WheelKeyType
+from linux.controller import ControlEventType
 from linux.drivers.G920 import G920
 # frame rate for client
 client_frame_rate:int = 60
@@ -12,12 +13,15 @@ enable_wizard:bool = False
 # The wheel model to use
 UserWheel:type = G920
 WizardWheel:type = G920
+
+# key maps for user to configure
 user_key_map:dict = {
     WheelKeyType.XBOX: ControlEventType.RESTART_WORLD,
     WheelKeyType.VIEW: ControlEventType.TOGGLE_INFO,
     WheelKeyType.MENU: ControlEventType.TOGGLE_HELP,
     WheelKeyType.LSB: ControlEventType.TOGGLE_SENSOR,
     WheelKeyType.RSB: ControlEventType.TOGGLE_CAMERA,
+    WheelKeyType.A: ControlEventType.SWITCH_DRIVER,
     WheelKeyType.LSHIFT: ControlEventType.DEC_GEAR,
     WheelKeyType.RSHIFT: ControlEventType.INC_GEAR,
     WheelKeyType.HPAD: ControlEventType.CHANGE_WEATHER,
@@ -26,5 +30,19 @@ user_key_map:dict = {
     WheelKeyType.CLUTCH: ControlEventType.CLUTCH,
     WheelKeyType.ACC: ControlEventType.ACCELERATOR,
 }
-# autopilot when luanch?
-autopilot_enabled = False
+
+wizard_key_map:dict = {
+    WheelKeyType.XBOX: ControlEventType.RESTART_WORLD,
+    WheelKeyType.VIEW: ControlEventType.TOGGLE_INFO,
+    WheelKeyType.MENU: ControlEventType.TOGGLE_HELP,
+    WheelKeyType.LSB: ControlEventType.TOGGLE_SENSOR,
+    WheelKeyType.RSB: ControlEventType.TOGGLE_CAMERA,
+    WheelKeyType.A: ControlEventType.SWITCH_DRIVER,
+    WheelKeyType.LSHIFT: ControlEventType.DEC_GEAR,
+    WheelKeyType.RSHIFT: ControlEventType.INC_GEAR,
+    WheelKeyType.HPAD: ControlEventType.CHANGE_WEATHER,
+    WheelKeyType.STEER: ControlEventType.STEER,
+    WheelKeyType.BRAKE: ControlEventType.BRAKE,
+    WheelKeyType.CLUTCH: ControlEventType.CLUTCH,
+    WheelKeyType.ACC: ControlEventType.ACCELERATOR,
+}

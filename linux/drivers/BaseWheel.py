@@ -4,7 +4,9 @@ import math
 from abc import ABC
 from linux.world import World
 from linux.utils.map import LinearMap
-from linux.drivers.inputs import InputDevType,ControlEventType, WheelKeyType
+from linux.drivers.inputs import InputDevType, WheelKeyType
+from linux.controller import ControlEventType
+import linux.config as config
 import threading
 
 
@@ -32,7 +34,10 @@ class BaseWheel(ABC):
         self.dev_type:InputDevType = dev_type
         # evdev device
         self._ev = None
-        self._ctl_key_map:dict = {}
+        if dev_type == InputDevType.WHEEL:
+            self._ctl_key_map:dict = config.user_key_map
+        else:
+            self._ctl_key_map:dict = config.wizard_key_map
         # data
         self.steer_val:int = 0 # steer input [0,65535]
         self.acc_val:int = 0 # accelarator input [0,255]
@@ -81,6 +86,7 @@ class BaseWheel(ABC):
                 if event_type is not ControlEventType.NONE:
                     self._controller.register_event(event_type,
                                                     self.dev_type,event.value)
+
 
     def _setFF(self,ff_type:int, val:float) -> None:
         """

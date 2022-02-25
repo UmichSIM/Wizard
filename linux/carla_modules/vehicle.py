@@ -28,8 +28,7 @@ class Vehicle:
         self.vehicle:carla.Vehicle = \
             World.get_instance().world.try_spawn_actor(blueprint, spawn_point)
         self._ctl:carla.VehicleControl = self.vehicle.get_control()
-        self.driver:InputDevType = InputDevType.WIZARD if config.autopilot_enabled \
-                                                else InputDevType.WHEEL
+        self.driver:InputDevType = InputDevType.WHEEL
         self.DriverWheel:type = self.__get_driver_wheel()
         self.enable_wizard:bool = config.enable_wizard
         self.user_wheel:UserWheel = UserWheel(InputDevType.WHEEL)
@@ -55,13 +54,15 @@ class Vehicle:
         self._ctl:carla.VehicleControl = self.vehicle.get_control()
 
 
-    def switch_driver(self):
+    def switch_driver(self,data:InputPacket):
         "Switch the current driver, wizard should be enabled"
         assert(self.enable_wizard)
-        if self.driver == InputDevType.WHEEL:
-            self.driver = InputDevType.WIZARD
-        else:
-            self.driver = InputDevType.WHEEL
+        assert(data.dev == InputDevType.WIZARD or data.dev == InputDevType.WHEEL)
+        # react on push
+        if data.val != 1: return
+        # control can only be claimed but not gived
+        if data.dev == self.driver: return
+        self.driver = data.dev
         self.DriverWheel = self.__get_driver_wheel()
 
 

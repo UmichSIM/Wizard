@@ -7,6 +7,7 @@ from linux.drivers.inputs import ControlEventType, InputDevType, InputPacket
 from linux.carla_modules.vehicle import Vehicle
 from threading import Lock
 from queue import Queue
+from typing import Callable
 import linux.config as config
 from enum import IntEnum, auto
 import carla
@@ -15,19 +16,31 @@ class ControlEventType(IntEnum):
     """
     Enum indicating the event requested for controller to handle
     """
+    # User Interface
     CHANGE_WEATHER = 0
     RESTART_WORLD = auto()
     TOGGLE_INFO = auto()
     TOGGLE_CAMERA = auto()
     TOGGLE_SENSOR = auto()
     TOGGLE_HELP = auto()
+    # Racing wheel
     DEC_GEAR = auto()
     INC_GEAR = auto()
     ACCELERATOR = auto()
     BRAKE = auto()
     STEER = auto()
     CLUTCH = auto()
+    # Controls
+    SWITCH_DRIVER = auto()
     NONE = auto() # do nothing
+
+
+def onpush(func:Callable) -> Callable:
+    """
+    Execute the function if the button is pushed,
+    used in event handling
+    """
+    return lambda data: func() if data.val == 1 else None
 
 
 class Controller:
@@ -54,17 +67,18 @@ class Controller:
         self.__event_lock:Lock = Lock()
         self.__eventsq:Queue = Queue()
         self.__event_handlers:list = [
-            lambda data: self.__world.next_weather(), # change weather
-            lambda data: self.__world.restart(), # restart world
-            lambda data: self.__hud.toggle_info(), # toggle info
-            lambda data: self.__world.camera_manager.toggle_camera(), # toggle camera
-            lambda data: self.__world.camera_manager.next_sensor(), # toggle sensor
-            lambda data: self.__hud.help.toggle(), # toggle help
+            onpush(self.__world.next_weather), # change weather
+            onpush(self.__world.restart), # restart world
+            onpush(self.__hud.toggle_info), # toggle info
+            onpush(self.__world.camera_manager.toggle_camera), # toggle camera
+            onpush(self.__world.camera_manager.next_sensor), # toggle sensor
+            onpush(self.__hud.help.toggle), # toggle help
             lambda data: self.__vehicle.set_reverse(data.dev, False), # Decrease Gear
             lambda data: self.__vehicle.set_reverse(data.dev, True), # Increate Gear
             self.__vehicle.set_throttle, # Accelerator
             self.__vehicle.set_brake, # Brake
             self.__vehicle.set_steer, # Steer
+            self.__vehicle.switch_driver,  # switch driver
             lambda data: None, # Clutch
         ]
         
@@ -107,3 +121,5 @@ class Controller:
             with self.__event_lock:
                 pac:InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
+
+
