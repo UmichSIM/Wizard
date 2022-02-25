@@ -38,7 +38,7 @@ class G920(BaseWheel):
         None, self.ev_key_map, None, self.ev_abs_map
     ]
         # give control key map
-        self._ctl_key_map = config.wheel1_key_map
+        self._ctl_key_map = config.user_key_map
         # TODO: Change connection type
         self._ev: evdev.InputDevice = InputDevice("/dev/input/event19")
         self._init()

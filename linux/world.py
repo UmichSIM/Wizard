@@ -60,13 +60,12 @@ class World(object):
             spawn_point.rotation.roll = 0.0
             spawn_point.rotation.pitch = 0.0
             self.destroy()
-            self.vehicle:Vehicle = Vehicle(blueprint,spawn_point)
+            self.vehicle.change_vehicle(blueprint,spawn_point)
         while self.vehicle is None:
             spawn_points = self.world.get_map().get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.vehicle:Vehicle = Vehicle(blueprint,spawn_point)
-            self.register_death(self.vehicle) # register death
-            # Set up the sensors.
+        # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.vehicle, self.hud)
         self.lane_invasion_sensor = LaneInvasionSensor(self.vehicle, self.hud)
         self.gnss_sensor = GnssSensor(self.vehicle)
@@ -84,9 +83,6 @@ class World(object):
         self.hud.notification('Weather: %s' % preset[1])
         # TODO: Check whether self.world can be used
         self.world.set_weather(preset[0])
-
-    def tick(self, clock):
-        self.hud.tick(self, clock)
 
     def render(self, display):
         self.camera_manager.render(display)

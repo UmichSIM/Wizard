@@ -100,7 +100,9 @@ class HUD(object):
         self.frame = timestamp.frame
         self.simulation_time = timestamp.elapsed_seconds
 
-    def tick(self, world:World, clock):
+    def tick(self, clock):
+        from linux.world import World
+        world:World = World.get_instance()
         self._notifications.tick(world, clock)
         if not self._show_info:
             return

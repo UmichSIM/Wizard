@@ -28,8 +28,7 @@ def game_loop(args):
         clock = pygame.time.Clock()
         while True:
             clock.tick_busy_loop(config.client_frame_rate)
-            controller.tick()
-            world.tick(clock)
+            controller.tick(clock)
             world.render(display)
             pygame.display.flip()
 

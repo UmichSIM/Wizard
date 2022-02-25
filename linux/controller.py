@@ -25,11 +25,8 @@ class Controller:
         # objects and references
         self.__world = World.get_instance()
         self.__hud = HUD.get_instance()
-        # Racing wheel registration
-        self.wheel = G920(InputDevType.WHEEL)
-        self.wheel.start()
 
-        self.__vehicle:Vehicle = self.__world.vehicle
+        self.__vehicle:Vehicle = Vehicle.get_instance()
         # vars
         self.driver:InputDevType = InputDevType.WIZARD if config.autopilot_enabled \
                                                 else InputDevType.WHEEL
@@ -44,11 +41,11 @@ class Controller:
             lambda data: self.__world.camera_manager.toggle_camera(), # toggle camera
             lambda data: self.__world.camera_manager.next_sensor(), # toggle sensor
             lambda data: self.__hud.help.toggle(), # toggle help
-            lambda data: self.__vehicle.set_reverse(False), # Decrease Gear
-            lambda data: self.__vehicle.set_reverse(True), # Increate Gear
-            lambda data: self.__vehicle.set_throttle(G920.PedalMap(data.val)), # Accelerator
-            lambda data: self.__vehicle.set_brake(G920.PedalMap(data.val)), # Brake
-            self.__update_steer_input, # Steer
+            lambda data: self.__vehicle.set_reverse(data.dev, False), # Decrease Gear
+            lambda data: self.__vehicle.set_reverse(data.dev, True), # Increate Gear
+            self.__vehicle.set_throttle, # Accelerator
+            self.__vehicle.set_brake, # Brake
+            self.__vehicle.set_steer, # Steer
             lambda data: None, # Clutch
         ]
         
@@ -74,27 +71,20 @@ class Controller:
             self.__eventsq.put_nowait(InputPacket(event_type,dev,val))
 
 
-    def tick(self):
+    def tick(self,clock):
         """
         Update all the stuffs in the main loop
         """
         self.handle_events()
         self.__vehicle.update()
-        self.wheel.SetAutoCenter()
+        self.__hud.tick(clock)
 
 
     def handle_events(self):
         """
         Handle events registered in the previous loop
         """
-        # TODO: test whether this configuration works
-        #       possible problem: event added while in loop, cause it not handled
         while not self.__eventsq.empty():
             with self.__event_lock:
                 pac:InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
-
-
-    def __update_steer_input(self,data:InputPacket):
-        if data.dev == self.driver:
-            self.__vehicle.set_steer(G920.SteerMap(data.val))

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from linux.drivers.inputs import InputEventType, WheelKeyType
+from linux.drivers.G920 import G920
 # frame rate for client
 client_frame_rate:int = 60
 # indicate whether to record the game onto the disk
@@ -7,7 +8,10 @@ cam_recording:bool = False
 cam_record_dir:str = "./_out"
 # Racing Wheel config
 wheel1_name = "Logitech G920 Driving Force Racing Wheel"
-wheel1_key_map:dict = {
+enable_wizard:bool = False
+UserWheel:type = G920
+WizardWheel:type = G920
+user_key_map:dict = {
     WheelKeyType.XBOX: InputEventType.RESTART_WORLD,
     WheelKeyType.VIEW: InputEventType.TOGGLE_INFO,
     WheelKeyType.MENU: InputEventType.TOGGLE_HELP,
