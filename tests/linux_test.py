@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# @deprecated The file is a test file for usage of evdev force feedback on linux
 # Copyright (c) 2019 Intel Labs
 #
 # This work is licensed under the terms of the MIT license.
