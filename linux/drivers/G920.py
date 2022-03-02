@@ -37,8 +37,7 @@ class G920(BaseWheel):
         self.ev_events:list = [
         None, self.ev_key_map, None, self.ev_abs_map
     ]
-        # TODO: Change connection type
-        self._ev: evdev.InputDevice = InputDevice("/dev/input/event19")
+        self._ev_connect()
         self._init()
 
 

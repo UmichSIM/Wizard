@@ -88,6 +88,14 @@ class BaseWheel(ABC):
                                                     self.dev_type,event.value)
 
 
+    def _ev_connect(self):
+        "Connect to evdev device based on config file"
+        if self.dev_type == InputDevType.WHEEL:
+            self._ev: evdev.InputDevice = InputDevice(config.user_input_event)
+        elif self.dev_type == InputDevType.WIZARD:
+            self._ev: evdev.InputDevice = InputDevice(config.wizard_input_event)
+        else: assert(False)
+
     def _setFF(self,ff_type:int, val:float) -> None:
         """
         Set the force feedback

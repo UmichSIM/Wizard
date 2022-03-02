@@ -14,6 +14,10 @@ enable_wizard:bool = False
 UserWheel:type = G920
 WizardWheel:type = G920
 
+# device event file
+user_input_event:str = "/dev/input/event19"
+wizard_input_event:str = "/dev/input/event20"
+
 # key maps for user to configure
 user_key_map:dict = {
     WheelKeyType.XBOX: ControlEventType.RESTART_WORLD,
