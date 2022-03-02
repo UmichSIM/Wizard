@@ -8,16 +8,19 @@ import time
 import pygame
 import config
 from linux.world import World
+from linux.hud import HUD
+from linux.carla_modules.vehicle import Vehicle
+
 
 class CameraManager:
     """
     Manage graphics stuffs with carla
     """
-    def __init__(self, parent_actor, hud):
+    def __init__(self):
         self.sensor = None
         self.surface = None
-        self._parent = parent_actor
-        self.hud = hud
+        self._parent = Vehicle.get_instance().vehicle
+        hud = HUD.get_instance()
         # recording stuffs
         self.recording = config.cam_recording
         self.record_dir = os.path.join(config.cam_record_dir, str(int(time.time())))

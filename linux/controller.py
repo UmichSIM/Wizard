@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from linux.helper import *
 from linux.world import World
 from linux.hud import HUD
 from linux.drivers.G920 import G920
@@ -8,31 +7,11 @@ from linux.carla_modules.vehicle import Vehicle
 from threading import Lock
 from queue import Queue
 from typing import Callable
-import linux.config as config
+from linux import config
 from enum import IntEnum, auto
 import carla
 
-class ControlEventType(IntEnum):
-    """
-    Enum indicating the event requested for controller to handle
-    """
-    # User Interface
-    CHANGE_WEATHER = 0
-    RESTART_WORLD = auto()
-    TOGGLE_INFO = auto()
-    TOGGLE_CAMERA = auto()
-    TOGGLE_SENSOR = auto()
-    TOGGLE_HELP = auto()
-    # Racing wheel
-    DEC_GEAR = auto()
-    INC_GEAR = auto()
-    ACCELERATOR = auto()
-    BRAKE = auto()
-    STEER = auto()
-    CLUTCH = auto()
-    # Controls
-    SWITCH_DRIVER = auto()
-    NONE = auto() # do nothing
+
 
 
 def onpush(func:Callable) -> Callable:
@@ -56,12 +35,12 @@ class Controller:
             raise Exception("Error: Reinitialization of Controller")
         # objects and references
         self.__world = World.get_instance()
+        self.__world.restart()
         self.__hud = HUD.get_instance()
 
         self.__vehicle:Vehicle = Vehicle.get_instance()
         # vars
-        self.driver:InputDevType = InputDevType.WIZARD if config.autopilot_enabled \
-                                                else InputDevType.WHEEL
+        self.driver:InputDevType = InputDevType.WHEEL
 
         # events handling
         self.__event_lock:Lock = Lock()
@@ -73,14 +52,16 @@ class Controller:
             onpush(self.__world.camera_manager.toggle_camera), # toggle camera
             onpush(self.__world.camera_manager.next_sensor), # toggle sensor
             onpush(self.__hud.help.toggle), # toggle help
-            lambda data: self.__vehicle.set_reverse(data.dev, False), # Decrease Gear
-            lambda data: self.__vehicle.set_reverse(data.dev, True), # Increate Gear
+            lambda data: self.__vehicle.set_reverse(data.dev, True), # Decrease Gear
+            lambda data: self.__vehicle.set_reverse(data.dev, False), # Increate Gear
             self.__vehicle.set_throttle, # Accelerator
             self.__vehicle.set_brake, # Brake
             self.__vehicle.set_steer, # Steer
             self.__vehicle.switch_driver,  # switch driver
             lambda data: None, # Clutch
         ]
+        # start multithreading
+        self.__vehicle.start()
         
 
 

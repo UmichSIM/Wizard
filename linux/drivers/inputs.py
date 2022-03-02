@@ -1,7 +1,28 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass
 from enum import IntEnum, auto
-from linux.controller import ControlEventType
+
+class ControlEventType(IntEnum):
+    """
+    Enum indicating the event requested for controller to handle
+    """
+    # User Interface
+    CHANGE_WEATHER = 0
+    RESTART_WORLD = auto()
+    TOGGLE_INFO = auto()
+    TOGGLE_CAMERA = auto()
+    TOGGLE_SENSOR = auto()
+    TOGGLE_HELP = auto()
+    # Racing wheel
+    DEC_GEAR = auto()
+    INC_GEAR = auto()
+    ACCELERATOR = auto()
+    BRAKE = auto()
+    STEER = auto()
+    CLUTCH = auto()
+    # Controls
+    SWITCH_DRIVER = auto()
+    NONE = auto() # do nothing
 
 class InputDevType(IntEnum):
     """

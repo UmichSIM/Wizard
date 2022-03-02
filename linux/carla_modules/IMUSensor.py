@@ -3,14 +3,15 @@ import carla
 import weakref
 import math
 from linux.world import World
+from linux.carla_modules.vehicle import Vehicle
 
 class IMUSensor(object):
     """
     Sensor to collect IMU data
     """
-    def __init__(self, parent_actor):
+    def __init__(self):
         self.sensor = None
-        self._parent = parent_actor
+        self._parent = Vehicle.get_instance().vehicle
         self.accelerometer = (0.0, 0.0, 0.0)
         self.gyroscope = (0.0, 0.0, 0.0)
         self.compass = 0.0

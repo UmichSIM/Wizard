@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-from evdev import ecodes
+from evdev import ecodes,InputDevice
 import math
 from abc import ABC
 from linux.world import World
 from linux.utils.map import LinearMap
-from linux.drivers.inputs import InputDevType, WheelKeyType
-from linux.controller import ControlEventType
-import linux.config as config
+from linux.drivers.inputs import InputDevType, WheelKeyType,ControlEventType
+from linux import config
 import threading
 
 
@@ -19,7 +18,6 @@ class BaseWheel(ABC):
     steer_max:int = 65535 # max possible value to steering wheel
     pedal_max:int = 255 # max possible value of pedals
     def __init__(self, dev_type:InputDevType = InputDevType.WHEEL):
-        from linux.controller import Controller
         # static variables
         self.ev_key_map:dict = {}
         self.ev_abs_map:dict = {}
@@ -43,8 +41,6 @@ class BaseWheel(ABC):
         self.acc_val:int = 0 # accelarator input [0,255]
         self.brake_val:int = 0 # brake input [0,255]
         self.clutch_val:int = 0 # clutch input [0,255]
-        # references
-        self._controller = Controller.get_instance()
 
 
     def _init(self):
@@ -79,12 +75,13 @@ class BaseWheel(ABC):
         '''
         Capture and handle events
         '''
+        from linux.controller import Controller
         for event in self._ev.read_loop():
             if event.type in self.ev_type_accepted:
                 key_type:WheelKeyType = self.ev_events[event.type].get(event.code)
                 event_type:ControlEventType = self._ctl_key_map.get(key_type, ControlEventType.NONE)
                 if event_type is not ControlEventType.NONE:
-                    self._controller.register_event(event_type,
+                    Controller.get_instance().register_event(event_type,
                                                     self.dev_type,event.value)
 
 

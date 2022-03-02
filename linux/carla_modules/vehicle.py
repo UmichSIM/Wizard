@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from time import time
 import carla
 from linux.drivers.inputs import InputDevType, InputPacket
 import linux.config as config
@@ -27,15 +28,13 @@ class Vehicle:
         from linux.world import World
         self.vehicle:carla.Vehicle = \
             World.get_instance().world.try_spawn_actor(blueprint, spawn_point)
-        self._ctl:carla.VehicleControl = self.vehicle.get_control()
+        self._ctl:carla.VehicleControl = carla.VehicleControl()
         self.driver:InputDevType = InputDevType.WHEEL
         self.DriverWheel:type = self.__get_driver_wheel()
         self.enable_wizard:bool = config.enable_wizard
         self.user_wheel:UserWheel = UserWheel(InputDevType.WHEEL)
-        self.user_wheel.start()
         if config.enable_wizard:
             self.wizard_wheel:WizardWheel = WizardWheel(InputDevType.WIZARD)
-            self.wizard_wheel.start()
 
 
     @staticmethod
@@ -44,6 +43,10 @@ class Vehicle:
             raise Exception("Error: Class Vehicle not initialized")
         return Vehicle.__instance
 
+    def start(self):
+        self.user_wheel.start()
+        if config.enable_wizard:
+            self.wizard_wheel.start()
 
     def change_vehicle(self, blueprint, spawn_point):
         "Using carla api to change the current vehicle"

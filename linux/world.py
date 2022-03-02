@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-from helper import *
 import random
-
+import re
+import carla
+from linux.helper import *
 
 class World(object):
     """
@@ -27,7 +28,6 @@ class World(object):
         self.__actor_filter = actor_filter
         # list of actors to be destroyed
         self.__destroy_actors:list = []
-        self.restart()
         self.world.on_tick(hud.on_world_tick)
 
 
@@ -66,14 +66,14 @@ class World(object):
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.vehicle:Vehicle = Vehicle(blueprint,spawn_point)
         # Set up the sensors.
-        self.collision_sensor = CollisionSensor(self.vehicle, self.hud)
-        self.lane_invasion_sensor = LaneInvasionSensor(self.vehicle, self.hud)
-        self.gnss_sensor = GnssSensor(self.vehicle)
-        self.imu_sensor = IMUSensor(self.vehicle) #new
-        self.camera_manager = CameraManager(self.vehicle, self.hud)
+        self.collision_sensor = CollisionSensor()
+        self.lane_invasion_sensor = LaneInvasionSensor()
+        self.gnss_sensor = GnssSensor()
+        self.imu_sensor = IMUSensor()
+        self.camera_manager = CameraManager()
         self.camera_manager.transform_index = cam_pos_index
         self.camera_manager.set_sensor(cam_index, notify=False)
-        actor_type = get_actor_display_name(self.vehicle)
+        actor_type = get_actor_display_name(self.vehicle.vehicle)
         self.hud.notification(actor_type)
 
     def next_weather(self, reverse=False):

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from linux.drivers.inputs import WheelKeyType
-from linux.controller import ControlEventType
+from linux.drivers.inputs import WheelKeyType,ControlEventType
 from linux.drivers.G920 import G920
 # frame rate for client
 client_frame_rate:int = 60

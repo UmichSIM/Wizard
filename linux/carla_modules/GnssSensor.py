@@ -2,14 +2,15 @@
 import carla
 import weakref
 from linux.world import World
+from linux.carla_modules.vehicle import Vehicle
 
 class GnssSensor(object):
     """
     Sensor to collect geographical data
     """
-    def __init__(self, parent_actor):
+    def __init__(self):
         self.sensor = None
-        self._parent = parent_actor
+        self._parent = Vehicle.get_instance().vehicle
         self.lat = 0.0
         self.lon = 0.0
         world = self._parent.get_world()

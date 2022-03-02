@@ -67,6 +67,7 @@ class HUD(object):
     """
     __instance = None
     def __init__(self, width, height):
+        from linux.carla_modules.vehicle import Vehicle
         self.dim = (width, height)
         font = pygame.font.Font(pygame.font.get_default_font(), 20)
         font_name = 'courier' if os.name == 'nt' else 'mono'
@@ -127,7 +128,7 @@ class HUD(object):
             'Server:  % 16.0f FPS' % self.server_fps,
             'Client:  % 16.0f FPS' % clock.get_fps(),
             '',
-            'Vehicle: % 20s' % get_actor_display_name(world.vehicle, truncate=20),
+            'Vehicle: % 20s' % get_actor_display_name(world.vehicle.vehicle, truncate=20),
             #'Map:     % 20s' % world.map.name,
             'Simulation time: % 12s' % datetime.timedelta(seconds=int(self.simulation_time)),
             '',
@@ -165,7 +166,7 @@ class HUD(object):
         if len(vehicles) > 1:
             self._info_text += ['Nearby vehicles:']
             distance = lambda l: math.sqrt((l.x - t.location.x)**2 + (l.y - t.location.y)**2 + (l.z - t.location.z)**2)
-            vehicles = [(distance(x.get_location()), x) for x in vehicles if x.id != world.vehicle.id]
+            vehicles = [(distance(x.get_location()), x) for x in vehicles if x.id != vehicle.vehicle.id]
             for d, vehicle in sorted(vehicles):
                 if d > 200.0:
                     break

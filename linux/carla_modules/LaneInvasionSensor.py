@@ -2,15 +2,17 @@
 import carla
 import weakref
 from linux.world import World
+from linux.hud import HUD
+from linux.carla_modules.vehicle import Vehicle
 
 class LaneInvasionSensor(object):
     """
     Sensor to detect Lane Invasion
     """
-    def __init__(self, parent_actor, hud):
+    def __init__(self):
         self.sensor = None
-        self._parent = parent_actor
-        self.hud = hud
+        self._parent = Vehicle.get_instance().vehicle
+        self.hud = HUD.get_instance()
         world = self._parent.get_world()
         bp = world.get_blueprint_library().find('sensor.other.lane_invasion')
         self.sensor = world.spawn_actor(bp, carla.Transform(), attach_to=self._parent)

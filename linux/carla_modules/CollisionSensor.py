@@ -4,18 +4,20 @@ import weakref
 import collections
 import math
 from linux.world import World
+from linux.hud import HUD
+from linux.carla_modules.vehicle import Vehicle
 from linux.helper import *
 
 class CollisionSensor:
     """
     Sensor to get the car collision data with the environment
     """
-    def __init__(self, parent_actor, hud):
+    def __init__(self):
         self.sensor = None
         self.history = []
-        self._parent = parent_actor
-        self.hud = hud
-        world = self._parent.get_world()
+        self._parent = Vehicle.get_instance().vehicle
+        self.hud = HUD.get_instance()
+        world = World.get_instance().world
         bp = world.get_blueprint_library().find('sensor.other.collision')
         self.sensor = world.spawn_actor(bp, carla.Transform(), attach_to=self._parent)
         World.get_instance().register_death(self.sensor)

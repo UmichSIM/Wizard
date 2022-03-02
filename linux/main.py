@@ -2,11 +2,11 @@
 import argparse
 import logging
 import pygame
-from linux.helper import *
 from linux.world import World
 from linux.controller import Controller
 from linux.hud import HUD
 from linux import config
+import carla
 
 def game_loop(args):
     pygame.init()
@@ -23,7 +23,7 @@ def game_loop(args):
 
         hud = HUD(args.width, args.height)
         world = World(client.get_world(), hud, args.filter)
-        controller = Controller()
+        controller = Controller.get_instance()
 
         clock = pygame.time.Clock()
         while True:

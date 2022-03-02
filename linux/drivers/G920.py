@@ -2,7 +2,7 @@
 import evdev
 import asyncio
 from evdev import ecodes, InputDevice, ff
-import linux.config as config
+from linux import config
 from linux.drivers.BaseWheel import BaseWheel
 from linux.drivers.inputs import InputDevType, WheelKeyType
 
