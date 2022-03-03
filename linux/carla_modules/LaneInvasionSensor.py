@@ -13,7 +13,7 @@ class LaneInvasionSensor(object):
         self.sensor = None
         self._parent = Vehicle.get_instance().vehicle
         self.hud = HUD.get_instance()
-        world = self._parent.get_world()
+        world = World.get_instance().world
         bp = world.get_blueprint_library().find('sensor.other.lane_invasion')
         self.sensor = world.spawn_actor(bp, carla.Transform(), attach_to=self._parent)
         World.get_instance().register_death(self.sensor)

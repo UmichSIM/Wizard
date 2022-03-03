@@ -63,10 +63,14 @@ class Vehicle:
         assert(data.dev == InputDevType.WIZARD or data.dev == InputDevType.WHEEL)
         # react on push
         if data.val != 1: return
-        # control can only be claimed but not gived
-        if data.dev == self.driver: return
-        self.driver = data.dev
+        # change user
+        if self.driver == InputDevType.WIZARD:
+            self.driver = InputDevType.WHEEL
+        else:
+            self.driver = InputDevType.WIZARD
         self.DriverWheel = self.__get_driver_wheel()
+        # should reinit the control
+        self._ctl = carla.VehicleControl()
 
 
     def get_transform(self):
