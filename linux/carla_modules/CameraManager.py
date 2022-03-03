@@ -20,7 +20,7 @@ class CameraManager:
         self.sensor = None
         self.surface = None
         self._parent = Vehicle.get_instance().vehicle
-        hud = HUD.get_instance()
+        self.hud = HUD.get_instance()
         # recording stuffs
         self.recording = config.cam_recording
         self.record_dir = os.path.join(config.cam_record_dir, str(int(time.time())))
@@ -44,8 +44,8 @@ class CameraManager:
         for item in self.sensors:
             bp = bp_library.find(item[0])
             if item[0].startswith('sensor.camera'):
-                bp.set_attribute('image_size_x', str(hud.dim[0]))
-                bp.set_attribute('image_size_y', str(hud.dim[1]))
+                bp.set_attribute('image_size_x', str(self.hud.dim[0]))
+                bp.set_attribute('image_size_y', str(self.hud.dim[1]))
             elif item[0].startswith('sensor.lidar'):
                 bp.set_attribute('range', '50')
             item.append(bp)

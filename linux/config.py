@@ -8,7 +8,7 @@ cam_recording:bool = False
 cam_record_dir:str = "./_out"
 # Racing Wheel config
 wheel1_name = "Logitech G920 Driving Force Racing Wheel"
-enable_wizard:bool = False
+enable_wizard:bool = True
 # The wheel model to use
 UserWheel:type = G920
 WizardWheel:type = G920
@@ -22,9 +22,9 @@ user_key_map:dict = {
     WheelKeyType.XBOX: ControlEventType.RESTART_WORLD,
     WheelKeyType.VIEW: ControlEventType.TOGGLE_INFO,
     WheelKeyType.MENU: ControlEventType.TOGGLE_HELP,
-    WheelKeyType.LSB: ControlEventType.TOGGLE_SENSOR,
+    # WheelKeyType.LSB: ControlEventType.TOGGLE_SENSOR,
+    WheelKeyType.LSB: ControlEventType.SWITCH_DRIVER,
     WheelKeyType.RSB: ControlEventType.TOGGLE_CAMERA,
-    WheelKeyType.A: ControlEventType.SWITCH_DRIVER,
     WheelKeyType.LSHIFT: ControlEventType.DEC_GEAR,
     WheelKeyType.RSHIFT: ControlEventType.INC_GEAR,
     WheelKeyType.HPAD: ControlEventType.CHANGE_WEATHER,
@@ -38,9 +38,9 @@ wizard_key_map:dict = {
     WheelKeyType.XBOX: ControlEventType.RESTART_WORLD,
     WheelKeyType.VIEW: ControlEventType.TOGGLE_INFO,
     WheelKeyType.MENU: ControlEventType.TOGGLE_HELP,
-    WheelKeyType.LSB: ControlEventType.TOGGLE_SENSOR,
+    # WheelKeyType.LSB: ControlEventType.TOGGLE_SENSOR,
+    WheelKeyType.LSB: ControlEventType.SWITCH_DRIVER,
     WheelKeyType.RSB: ControlEventType.TOGGLE_CAMERA,
-    WheelKeyType.A: ControlEventType.SWITCH_DRIVER,
     WheelKeyType.LSHIFT: ControlEventType.DEC_GEAR,
     WheelKeyType.RSHIFT: ControlEventType.INC_GEAR,
     WheelKeyType.HPAD: ControlEventType.CHANGE_WEATHER,

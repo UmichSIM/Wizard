@@ -54,7 +54,7 @@ class Vehicle:
         self.vehicle.destroy()
         self.vehicle:carla.Vehicle = \
             World.get_instance().world.try_spawn_actor(blueprint, spawn_point)
-        self._ctl:carla.VehicleControl = self.vehicle.get_control()
+        self._ctl:carla.VehicleControl = carla.VehicleControl()
 
 
     def switch_driver(self,data:InputPacket):

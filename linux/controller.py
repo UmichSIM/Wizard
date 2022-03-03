@@ -49,20 +49,20 @@ class Controller:
             onpush(self.__world.next_weather), # change weather
             onpush(self.__world.restart), # restart world
             onpush(self.__hud.toggle_info), # toggle info
-            onpush(self.__world.camera_manager.toggle_camera), # toggle camera
-            onpush(self.__world.camera_manager.next_sensor), # toggle sensor
+            onpush(self.__toggle_cam), # toggle camera
+            onpush(self.__toggle_sensor), # toggle sensor
             onpush(self.__hud.help.toggle), # toggle help
             lambda data: self.__vehicle.set_reverse(data.dev, True), # Decrease Gear
             lambda data: self.__vehicle.set_reverse(data.dev, False), # Increate Gear
             self.__vehicle.set_throttle, # Accelerator
             self.__vehicle.set_brake, # Brake
             self.__vehicle.set_steer, # Steer
-            self.__vehicle.switch_driver,  # switch driver
             lambda data: None, # Clutch
+            self.__vehicle.switch_driver,  # switch driver
         ]
         # start multithreading
         self.__vehicle.start()
-        
+
 
 
     @staticmethod
@@ -103,4 +103,10 @@ class Controller:
                 pac:InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
 
+    def __toggle_cam(self):
+        "Toggle camera perspective"
+        self.__world.camera_manager.toggle_camera()
 
+    def __toggle_sensor(self):
+        "Toggle sensor used"
+        self.__world.camera_manager.next_sensor()

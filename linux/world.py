@@ -100,3 +100,4 @@ class World(object):
                     actor.destroy()
                 except NameError:
                     print("actor does not have destroy method!")
+        self.__destroy_actors.clear()
