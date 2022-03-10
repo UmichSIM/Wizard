@@ -2,6 +2,7 @@
 import argparse
 import logging
 import pygame
+from linux.drivers.inputs import InputDevType
 from linux.world import World
 from linux.controller import Controller
 from linux.hud import HUD
@@ -42,6 +43,14 @@ def main():
     argparser = argparse.ArgumentParser(
         description='CARLA Manual Control Client')
     argparser.add_argument(
+        '-w', '--wizard',
+        action='store_true',
+        help='run in wizard mode')
+    argparser.add_argument(
+        '-u', '--user',
+        action='store_true',
+        help='run in user mode')
+    argparser.add_argument(
         '-v', '--verbose',
         action='store_true',
         dest='debug',
@@ -58,10 +67,6 @@ def main():
         type=int,
         help='TCP port to listen to (default: 2000)')
     argparser.add_argument(
-        '-a', '--autopilot',
-        action='store_true',
-        help='enable autopilot')
-    argparser.add_argument(
         '--res',
         metavar='WIDTHxHEIGHT',
         default='1280x720',
@@ -72,6 +77,11 @@ def main():
         default='vehicle.*',
         help='actor filter (default: "vehicle.*")')
     args = argparser.parse_args()
+
+    if args.wizard:
+        config.client_mode = InputDevType.WIZARD
+    elif args.user:
+        config.client_mode = InputDevType.WHEEL
 
     args.width, args.height = [int(x) for x in args.res.split('x')]
 

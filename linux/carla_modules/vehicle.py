@@ -3,7 +3,7 @@ from time import time
 import carla
 from linux.drivers.inputs import InputDevType, InputPacket
 import linux.config as config
-from linux.config import UserWheel, WizardWheel
+from linux.config import WheelType
 
 class Vehicle:
     """
@@ -26,15 +26,23 @@ class Vehicle:
             raise Exception("Error: Reinitialization of Vehicle.")
 
         from linux.world import World
-        self.vehicle:carla.Vehicle = \
-            World.get_instance().world.try_spawn_actor(blueprint, spawn_point)
+        # user mode, directly create vehicles
+        world = World.get_instance()
+        if config.client_mode == InputDevType.WHEEL:
+            self.vehicle:carla.Vehicle = \
+                world.world.try_spawn_actor(blueprint, spawn_point)
+            vpc = self.vehicle.get_physics_control()
+            vpc.max_rpm+=1 # indicate that the vehicle is controlled manually
+            self.vehicle.apply_physics_control(vpc)
+        else: # wizard mode, prompt to choose vehicle
+            vehicles = world.world.get_actors().filter('vehicle.*')
+            for vehicle in vehicles:
+                if vehicle.get_physics_control().max_rpm != 5000:
+                    self.vehicle:carla.Vehicle = vehicle
+
         self._ctl:carla.VehicleControl = carla.VehicleControl()
-        self.driver:InputDevType = InputDevType.WHEEL
-        self.DriverWheel:type = self.__get_driver_wheel()
-        self.enable_wizard:bool = config.enable_wizard
-        self.user_wheel:UserWheel = UserWheel(InputDevType.WHEEL)
-        if config.enable_wizard:
-            self.wizard_wheel:WizardWheel = WizardWheel(InputDevType.WIZARD)
+        self.driver:InputDevType = self._get_driver()
+        self.joystick_wheel:WheelType = WheelType(config.client_mode)
 
 
     @staticmethod
@@ -44,9 +52,7 @@ class Vehicle:
         return Vehicle.__instance
 
     def start(self):
-        self.user_wheel.start()
-        if config.enable_wizard:
-            self.wizard_wheel.start()
+        self.joystick_wheel.start()
 
     def change_vehicle(self, blueprint, spawn_point):
         "Using carla api to change the current vehicle"
@@ -59,18 +65,21 @@ class Vehicle:
 
     def switch_driver(self,data:InputPacket):
         "Switch the current driver, wizard should be enabled"
-        assert(self.enable_wizard)
         assert(data.dev == InputDevType.WIZARD or data.dev == InputDevType.WHEEL)
         # react on push
         if data.val != 1: return
+        vpc = self.vehicle.get_physics_control()
         # change user
         if self.driver == InputDevType.WIZARD:
             self.driver = InputDevType.WHEEL
+            vpc.max_rpm-=1
         else:
             self.driver = InputDevType.WIZARD
-        self.DriverWheel = self.__get_driver_wheel()
+            vpc.max_rpm+=1
+
+        self.vehicle.apply_physics_control(vpc)
         # should reinit the control
-        self._ctl = carla.VehicleControl()
+        # self._ctl = carla.VehicleControl()
 
 
     def get_transform(self):
@@ -84,38 +93,49 @@ class Vehicle:
 
 
     def update(self):
-        self.vehicle.apply_control(self._ctl)
-        self.user_wheel.SetAutoCenter()
-        if self.enable_wizard:
-            self.wizard_wheel.SetAutoCenter()
+        self.driver = self._get_driver()
+        if self.driver == config.client_mode:
+            self.vehicle.apply_control(self._ctl)
+        else: 
+            self._ctl = self.vehicle.get_control()
+        
+        # force feedback based on current states
+        self.joystick_wheel.SetAutoCenter()
 
 
     def set_brake(self,data:InputPacket):
         "set the vehicle brake value"
-        if data.dev == self.driver:
-            self._ctl.brake = self.DriverWheel.PedalMap(data.val)
+        self._ctl.brake = self.joystick_wheel.PedalMap(data.val)
 
 
     def set_throttle(self,data:InputPacket):
         "set the vehicle throttle value"
-        if data.dev == self.driver:
-            self._ctl.throttle = self.DriverWheel.PedalMap(data.val)
+        self._ctl.throttle = self.joystick_wheel.PedalMap(data.val)
 
     def set_steer(self,data:InputPacket):
         "set the vehicle steer value"
-        if data.dev == self.driver:
-            self._ctl.steer = self.DriverWheel.SteerMap(data.val)
+        self._ctl.steer = self.joystick_wheel.SteerMap(data.val)
 
 
     def set_reverse(self,dev:InputDevType, val:bool):
         "Set the inverse mode of the vehicle"
-        if dev == self.driver:
-            self._ctl.reverse = val
+        self._ctl.reverse = val
 
 
     def get_control(self):
         "From carla api"
         return self._ctl
+
+
+    def _get_driver(self) -> InputDevType:
+        "Get the current driver as string"
+        vpc = self.vehicle.get_physics_control()
+        if vpc.max_rpm % 10 == 1:
+            return InputDevType.WHEEL
+        elif vpc.max_rpm % 10 == 2:
+            return InputDevType.WIZARD
+        else:
+            raise Exception("Invalid max_rpm: {}".format(vpc.max_rpm))
 
 
     def get_driver_name(self) -> str:
@@ -124,12 +144,3 @@ class Vehicle:
             return "Human"
         else:
             return "Wizard"
-
-
-    def __get_driver_wheel(self) -> type:
-        if self.driver == InputDevType.WHEEL:
-            return UserWheel
-        elif self.driver == InputDevType.WIZARD:
-            return WizardWheel
-        else:
-            raise Exception("Invalid driver: {}".format(self.driver))

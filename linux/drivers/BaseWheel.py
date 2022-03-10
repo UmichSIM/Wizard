@@ -2,7 +2,6 @@
 from evdev import ecodes,InputDevice
 import math
 from abc import ABC
-from linux.world import World
 from linux.utils.map import LinearMap
 from linux.drivers.inputs import InputDevType, WheelKeyType,ControlEventType
 from linux import config
@@ -32,10 +31,7 @@ class BaseWheel(ABC):
         self.dev_type:InputDevType = dev_type
         # evdev device
         self._ev = None
-        if dev_type == InputDevType.WHEEL:
-            self._ctl_key_map:dict = config.user_key_map
-        else:
-            self._ctl_key_map:dict = config.wizard_key_map
+        self._ctl_key_map:dict = {}
         # data
         self.steer_val:int = 0 # steer input [0,65535]
         self.acc_val:int = 0 # accelarator input [0,255]
@@ -53,8 +49,8 @@ class BaseWheel(ABC):
         '''
         Update the auto center force feedback using speed
         '''
-        world = World.get_instance()
-        v = world.vehicle.get_velocity()
+        from linux.carla_modules.vehicle import Vehicle
+        v = Vehicle.get_instance().get_velocity()
         speed = (3.6 * math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2))
 
         # speed limit that influences the autocenter
@@ -87,11 +83,7 @@ class BaseWheel(ABC):
 
     def _ev_connect(self):
         "Connect to evdev device based on config file"
-        if self.dev_type == InputDevType.WHEEL:
-            self._ev: evdev.InputDevice = InputDevice(config.user_input_event)
-        elif self.dev_type == InputDevType.WIZARD:
-            self._ev: evdev.InputDevice = InputDevice(config.wizard_input_event)
-        else: assert(False)
+        self._ev: evdev.InputDevice = InputDevice(config.user_input_event)
 
     def _setFF(self,ff_type:int, val:float) -> None:
         """

@@ -4,6 +4,9 @@
 + [ ] encapsulate a vehicle class
 
 # Changelog
++ 22.03.11
+  + switch to multi-client
+  + TODO: make the control switching smoother
 + 22.02.19
   + Complete most of the changes, wait for testing
 + 22.02.15

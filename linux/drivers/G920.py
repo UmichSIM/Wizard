@@ -12,6 +12,7 @@ class G920(BaseWheel):
     def __init__(self, dev_type: InputDevType):
         # super class
         super().__init__(dev_type)
+        self._ctl_key_map:dict = config.g920_key_map
         self.ev_key_map = {
             288: WheelKeyType.A,
             289: WheelKeyType.B,
