@@ -257,7 +257,7 @@ class DualControl(object):
 
         self._parser = ConfigParser()
         # Update PATH TO wheel_config.ini
-        self._parser.read(r'/home/green/carla/wheel_config.ini')
+        self._parser.read(r'./wheel_config.ini')
         #self._parser.read(r'E:\\CARLA\\carla\\wheel_config.ini')
         #self._parser.read('wheel_config.ini')
         self._steer_idx = int(
