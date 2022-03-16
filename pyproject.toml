@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "wizard"
+version = "0.1.0"
+description = ""
+authors = ["Umich Driving Simulator Team <you@example.com>"]
+packages = [
+  { include = "linux" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.6, <3.7"
+evdev = "^1.4.0"
+carla = "^0.9.13"
+pygame = "^2.1.2"
+dataclasses = "^0.8"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
