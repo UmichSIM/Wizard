@@ -2,8 +2,8 @@
 import carla
 import weakref
 import math
-from linux.world import World
-from linux.carla_modules.vehicle import Vehicle
+from wizard.world import World
+from wizard.carla_modules.vehicle import Vehicle
 
 class IMUSensor(object):
     """

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from time import time
 import carla
-from linux.drivers.inputs import InputDevType, InputPacket
-import linux.config as config
-from linux.config import WheelType
+from wizard.drivers.inputs import InputDevType, InputPacket
+from wizard import config
+from wizard.config import WheelType
 
 class Vehicle:
     """
@@ -25,7 +25,7 @@ class Vehicle:
         else:
             raise Exception("Error: Reinitialization of Vehicle.")
 
-        from linux.world import World
+        from wizard.world import World
         # user mode, directly create vehicles
         world = World.get_instance()
         if config.client_mode == InputDevType.WHEEL:
@@ -56,7 +56,7 @@ class Vehicle:
 
     def change_vehicle(self, blueprint, spawn_point):
         "Using carla api to change the current vehicle"
-        from linux.world import World
+        from wizard.world import World
         self.vehicle.destroy()
         self.vehicle:carla.Vehicle = \
             World.get_instance().world.try_spawn_actor(blueprint, spawn_point)

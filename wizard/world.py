@@ -2,7 +2,7 @@
 import random
 import re
 import carla
-from linux.helper import *
+from wizard.helper import *
 
 class World(object):
     """
@@ -38,12 +38,12 @@ class World(object):
         return World.__instance
 
     def restart(self):
-        from linux.carla_modules.CollisionSensor import CollisionSensor
-        from linux.carla_modules.LaneInvasionSensor import LaneInvasionSensor
-        from linux.carla_modules.GnssSensor import GnssSensor
-        from linux.carla_modules.IMUSensor import IMUSensor
-        from linux.carla_modules.CameraManager import CameraManager
-        from linux.carla_modules.vehicle import Vehicle
+        from wizard.carla_modules.CollisionSensor import CollisionSensor
+        from wizard.carla_modules.LaneInvasionSensor import LaneInvasionSensor
+        from wizard.carla_modules.GnssSensor import GnssSensor
+        from wizard.carla_modules.IMUSensor import IMUSensor
+        from wizard.carla_modules.CameraManager import CameraManager
+        from wizard.carla_modules.vehicle import Vehicle
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0

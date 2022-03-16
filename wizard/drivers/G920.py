@@ -1,10 +1,7 @@
 #!/usr/bin/env python
-import evdev
-import asyncio
-from evdev import ecodes, InputDevice, ff
-from linux import config
-from linux.drivers.BaseWheel import BaseWheel
-from linux.drivers.inputs import InputDevType, WheelKeyType
+from wizard import config
+from wizard.drivers.BaseWheel import BaseWheel
+from wizard.drivers.inputs import InputDevType, WheelKeyType
 
 
 class G920(BaseWheel):

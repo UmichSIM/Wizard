@@ -2,11 +2,11 @@
 import argparse
 import logging
 import pygame
-from linux.drivers.inputs import InputDevType
-from linux.world import World
-from linux.controller import Controller
-from linux.hud import HUD
-from linux import config
+from wizard.drivers.inputs import InputDevType
+from wizard.world import World
+from wizard.controller import Controller
+from wizard.hud import HUD
+from wizard import config
 import carla
 
 def game_loop(args):

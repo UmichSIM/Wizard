@@ -3,10 +3,10 @@ import carla
 import weakref
 import collections
 import math
-from linux.world import World
-from linux.hud import HUD
-from linux.carla_modules.vehicle import Vehicle
-from linux.helper import *
+from wizard.world import World
+from wizard.hud import HUD
+from wizard.carla_modules.vehicle import Vehicle
+from wizard.helper import *
 
 class CollisionSensor:
     """

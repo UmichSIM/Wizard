@@ -8,11 +8,11 @@ To find out the values of your steering wheel use jstest-gtk in Ubuntu.
 import pygame
 import os
 import carla
-from linux.carla_modules.vehicle import Vehicle
-from linux.helper import *
+from wizard.carla_modules.vehicle import Vehicle
+from wizard.helper import *
 import datetime
 import math
-from linux.world import World
+from wizard.world import World
 
 class FadingText(object):
     def __init__(self, font, dim, pos):
@@ -67,7 +67,7 @@ class HUD(object):
     """
     __instance = None
     def __init__(self, width, height):
-        from linux.carla_modules.vehicle import Vehicle
+        from wizard.carla_modules.vehicle import Vehicle
         self.dim = (width, height)
         font = pygame.font.Font(pygame.font.get_default_font(), 20)
         font_name = 'courier' if os.name == 'nt' else 'mono'
@@ -103,8 +103,8 @@ class HUD(object):
         self.simulation_time = timestamp.elapsed_seconds
 
     def tick(self, clock):
-        from linux.world import World
-        from linux.carla_modules.vehicle import Vehicle
+        from wizard.world import World
+        from wizard.carla_modules.vehicle import Vehicle
         world:World = World.get_instance()
         self._notifications.tick(world, clock)
         if not self._show_info:

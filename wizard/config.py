@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from linux.drivers.inputs import InputDevType, WheelKeyType,ControlEventType
-from linux.drivers.G920 import G920
+from wizard.drivers.inputs import InputDevType, WheelKeyType,ControlEventType
+from wizard.drivers.G920 import G920
 # frame rate for client
 client_frame_rate:int = 60
 # indicate whether to record the game onto the disk

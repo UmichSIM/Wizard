@@ -2,9 +2,9 @@
 from evdev import ecodes,InputDevice
 import math
 from abc import ABC
-from linux.utils.map import LinearMap
-from linux.drivers.inputs import InputDevType, WheelKeyType,ControlEventType
-from linux import config
+from wizard.utils.map import LinearMap
+from wizard.drivers.inputs import InputDevType, WheelKeyType,ControlEventType
+from wizard import config
 import threading
 
 
@@ -49,7 +49,7 @@ class BaseWheel(ABC):
         '''
         Update the auto center force feedback using speed
         '''
-        from linux.carla_modules.vehicle import Vehicle
+        from wizard.carla_modules.vehicle import Vehicle
         v = Vehicle.get_instance().get_velocity()
         speed = (3.6 * math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2))
 
@@ -71,7 +71,7 @@ class BaseWheel(ABC):
         '''
         Capture and handle events
         '''
-        from linux.controller import Controller
+        from wizard.controller import Controller
         for event in self._ev.read_loop():
             if event.type in self.ev_type_accepted:
                 key_type:WheelKeyType = self.ev_events[event.type].get(event.code)

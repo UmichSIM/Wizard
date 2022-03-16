@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import carla
 import weakref
-from linux.world import World
-from linux.carla_modules.vehicle import Vehicle
+from wizard.world import World
+from wizard.carla_modules.vehicle import Vehicle
 
 class GnssSensor(object):
     """

@@ -7,7 +7,7 @@ Repository for Wizard of Oz Project.
 ## Table of Contents
 
 * [Background](##Background)
-* [Install & Usage](##Install & Usage)
+* [Install & Usage](##Install-&-Usage)
 * [Maintainers](##Maintainers)
 * [License](##License)
 
@@ -35,10 +35,10 @@ poetry install
 
 ```bash
 # run directly
-poetry run python linux/main.py
+poetry run python wizard/main.py
 # alternatively, activate the virtual environment for more flexibility
 poetry shell
-python linux/main.py
+python wizard/main.py
 ```
 
 The client program needs the Carla server to be running, use command line options to change the default host and port.
@@ -46,4 +46,17 @@ The client program needs the Carla server to be running, use command line option
 ## Maintainers
 
 ## License
+
+
+
+
+
+
+
+
+
+
+
+
+
 

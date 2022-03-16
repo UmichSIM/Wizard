@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-from linux.world import World
-from linux.hud import HUD
-from linux.drivers.G920 import G920
-from linux.drivers.inputs import ControlEventType, InputDevType, InputPacket
-from linux.carla_modules.vehicle import Vehicle
 from threading import Lock
 from queue import Queue
 from typing import Callable
-from linux import config
-from enum import IntEnum, auto
-import carla
+from wizard.world import World
+from wizard.hud import HUD
+from wizard.drivers.inputs import ControlEventType, InputDevType, InputPacket
+from wizard.carla_modules.vehicle import Vehicle
 
 
 
