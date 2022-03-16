@@ -19,16 +19,18 @@ The Wizard of Oz is an inexpensive and flexible method to examine shared control
 
 The project uses [poetry](https://python-poetry.org/) to manage packages and environments, make sure poetry is installed before continue. See the [documentation](https://python-poetry.org/docs/) for more infos.
 
-* select desired python version, currently only support `python3.6.*`.
+* select desired python version, currently only support `python3.6-8`.
 
 ```bash
-poetry env use /full/path/to/python3.6.*
+poetry env use /full/path/to/python3.[6-8].*
 ```
 
 * install dependencies
 
 ```bash
 poetry install
+# if using python 3.6, need to install dataclasses
+pip install dataclasses
 ```
 
 * run the program
@@ -46,7 +48,6 @@ The client program needs the Carla server to be running, use command line option
 ## Maintainers
 
 ## License
-
 
 
 

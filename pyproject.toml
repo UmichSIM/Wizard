@@ -8,11 +8,10 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.6, <3.7"
+python = ">=3.6, <3.9"
 evdev = "^1.4.0"
 carla = "^0.9.13"
 pygame = "^2.1.2"
-dataclasses = "^0.8"
 numpy = "^1.19.5"
 
 [tool.poetry.dev-dependencies]
