@@ -79,7 +79,8 @@ class Vehicle:
 
         self.vehicle.apply_physics_control(vpc)
         # should reinit the control
-        # self._ctl = carla.VehicleControl()
+        self._ctl = carla.VehicleControl()
+        self.vehicle.apply_ctl(self._ctl)
 
 
     def get_transform(self):
@@ -96,11 +97,14 @@ class Vehicle:
         self.driver = self._get_driver()
         if self.driver == config.client_mode:
             self.vehicle.apply_control(self._ctl)
+            # force feedback based on current states
+            self.joystick_wheel.SetAutoCenter()
+            # TODO: change
+            self.joystick_wheel.erase_effect()
         else: 
             self._ctl = self.vehicle.get_control()
-        
-        # force feedback based on current states
-        self.joystick_wheel.SetAutoCenter()
+            # force follow
+            self.joystick_wheel.setFF_spring(int(self._ctl.steer*32767))
 
 
     def set_brake(self,data:InputPacket):

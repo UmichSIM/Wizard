@@ -145,11 +145,18 @@ class BaseWheel(ABC):
 
         self._ev.write(ecodes.EV_FF, spring_id, 1)
 
-        # erase previous eefect
+        # erase previous effect
         if self._ff_spring_id is not None:
             self._ev.erase_effect(self._ff_spring_id)
 
         self._ff_spring_id = spring_id
+
+
+    # TODO: change
+    def erase_effect(self):
+        if self._ff_spring_id is not None:
+            self._ev.erase_effect(self._ff_spring_id)
+            self._ff_spring_id = None
 
 
     @classmethod
