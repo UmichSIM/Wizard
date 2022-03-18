@@ -80,7 +80,7 @@ class Vehicle:
         self.vehicle.apply_physics_control(vpc)
         # should reinit the control
         self._ctl = carla.VehicleControl()
-        self.vehicle.apply_ctl(self._ctl)
+        self.vehicle.apply_control(self._ctl)
 
 
     def get_transform(self):
