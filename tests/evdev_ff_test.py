@@ -9,14 +9,13 @@ from evdev import ecodes, InputDevice, ff
 dev = evdev.InputDevice("/dev/input/event20")
 center_pos = -10000  # from -32768 to 32767
 
-TwoConditions = ff.Condition * 2
-springs = TwoConditions()
+springs = (ff.Condition * 2)()
 for spring in springs:
     spring.right_saturation = 65535
     spring.left_saturation = 65535
     spring.right_coeff = (2 << 14) - 1
     spring.left_coeff = (2 << 14) - 1
-    spring.deadband = 1000
+    spring.deadband = 0
     spring.center = center_pos
 
 ef_type = ff.EffectType(ff_condition_effect=springs)

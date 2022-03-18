@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from evdev import ecodes,InputDevice
+from evdev import ecodes,InputDevice, ff
 import math
 from abc import ABC
 from wizard.utils.map import LinearMap
@@ -37,11 +37,17 @@ class BaseWheel(ABC):
         self.acc_val:int = 0 # accelarator input [0,255]
         self.brake_val:int = 0 # brake input [0,255]
         self.clutch_val:int = 0 # clutch input [0,255]
+        # FF id
+        self._ff_spring_id = None
 
+
+    def __del__(self):
+        "Destructor, used to erase ff settings"
+        self._ev.close()
 
     def _init(self):
-        # init with 0.75 autocenter force
-        self._setFF(ecodes.FF_AUTOCENTER, 0.75)
+        # init with 49150 autocenter force
+        # self._setFF(ecodes.FF_AUTOCENTER, 49150)
         print("Racing wheel registered")
 
 
@@ -58,7 +64,7 @@ class BaseWheel(ABC):
         if(speed > S2W_THRESHOLD):
             speed = S2W_THRESHOLD
             # autocenterCmd  \in [0,65535]
-        autocenterCmd:float = math.sin(speed/S2W_THRESHOLD)
+        autocenterCmd:int = int(math.sin(speed/S2W_THRESHOLD)*65535)
 
         # send autocenterCmd to the steeringwheel
         self._setFF(ecodes.FF_AUTOCENTER, autocenterCmd)
@@ -85,7 +91,7 @@ class BaseWheel(ABC):
         "Connect to evdev device based on config file"
         self._ev: evdev.InputDevice = InputDevice(config.user_input_event)
 
-    def _setFF(self,ff_type:int, val:float) -> None:
+    def _setFF(self,ff_type:int, val:int) -> None:
         """
         Set the force feedback
 
@@ -96,11 +102,54 @@ class BaseWheel(ABC):
                 ecodes.FF_DAMPER
                 ecodes.FF_GAIN
                 ecodes.FF_FRICTION
+                ecodes.FF_SPRING
                 ecodes.FF_RAMP
-        - val: float ranging from [0,1]
+        - val: int ranging from [0,65535] or [-32768,32767]
         """
-        assert(val >= 0 and val <= 1)
-        self._ev.write(ecodes.EV_FF, ff_type, int(65535*val))
+        if ff_type == ecodes.FF_SPRING:
+            self.setFF_spring(val)
+            return
+        assert(val >= 0 and val <= 65535)
+        self._ev.write(ecodes.EV_FF, ff_type, val)
+
+    def setFF_spring(self, pos:int, right_saturation:int = 65535,
+                      left_saturation:int = 65535, right_coeff = 32767,
+                      left_coeff = 32767, deadband = 0) -> None:
+        """
+        Set the spring force feedback
+        Input:
+        - pos: position of the balance point
+        - right_saturation: maximum level when wheel moved all way to right
+        - left_saturation: same for the left side
+        - right_coeff: controls how fast the force grows when the joystick
+                       moves to the right
+        - left_coeff: same for the left side
+        - deadband: size of the dead zone, where no force is produced
+        """
+        # create effect
+        springs = (ff.Condition * 2)()
+        for spring in springs:
+            spring.right_saturation = right_saturation
+            spring.left_saturation = left_saturation
+            spring.right_coeff = right_coeff
+            spring.left_coeff = left_coeff
+            spring.deadband = deadband
+            spring.center = pos
+
+        # register effect
+        spring_id = self._ev.upload_effect(
+                ff.Effect(ecodes.FF_SPRING, -1, 16384,
+                          ff.Trigger(0,0),
+                          ff.Replay(32768,0),
+                          ff.EffectType(ff_condition_effect = springs)))
+
+        self._ev.write(ecodes.EV_FF, spring_id, 1)
+
+        # erase previous eefect
+        if self._ff_spring_id is not None:
+            self._ev.erase_effect(self._ff_spring_id)
+
+        self._ff_spring_id = spring_id
 
 
     @classmethod
