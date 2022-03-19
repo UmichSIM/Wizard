@@ -5,6 +5,8 @@
 + [x] figure out why screenshots in _out
 + [x] try to use `poetry` to manage the environments
 + [x] encapsulate a vehicle class
++ [ ] figure out how to change driver without any side effect
+  + currently the switch is achieved by modifying `VehiclePhysicalControl`, which will cause vehicle to reinitialize and stop...
 
 ## Changelog
 

@@ -27,16 +27,14 @@ def game_loop(args):
         controller = Controller.get_instance()
 
         clock = pygame.time.Clock()
-        while True:
-            clock.tick_busy_loop(config.client_frame_rate)
-            controller.tick(clock)
-            world.render(display)
-            pygame.display.flip()
+        controller.run(clock,display)
 
     finally:
+        print('\nCancelled by user. Bye!')
         if world is not None:
             world.destroy()
         pygame.quit()
+
 
 
 def main():

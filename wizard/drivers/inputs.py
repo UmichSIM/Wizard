@@ -22,6 +22,7 @@ class ControlEventType(IntEnum):
     CLUTCH = auto()
     # Controls
     SWITCH_DRIVER = auto()
+    CLOSE = auto() # close the program
     NONE = auto() # do nothing
 
 class InputDevType(IntEnum):
