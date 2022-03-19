@@ -65,6 +65,7 @@ class World(object):
             spawn_points = self.world.get_map().get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.vehicle:Vehicle = Vehicle(blueprint,spawn_point)
+            self.register_death(self.vehicle)
         # Set up the sensors.
         self.collision_sensor = CollisionSensor()
         self.lane_invasion_sensor = LaneInvasionSensor()
@@ -94,6 +95,7 @@ class World(object):
 
 
     def destroy(self):
+        "TODO: change to destructor"
         for actor in self.__destroy_actors:
             if actor is not None:
                 try:

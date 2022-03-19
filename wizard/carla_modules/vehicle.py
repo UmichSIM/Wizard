@@ -36,7 +36,6 @@ class Vehicle:
             vpc.max_rpm-=1 # indicate that the vehicle is controlled manually
             self.vehicle.apply_physics_control(vpc)
             vpc = self.vehicle.get_physics_control()
-            print(vpc.max_rpm)
         else: # wizard mode, prompt to choose vehicle
             vehicles = world.world.get_actors().filter('vehicle.*')
             for vehicle in vehicles:
@@ -62,6 +61,15 @@ class Vehicle:
 
     def start(self):
         self.joystick_wheel.start()
+
+
+    def destroy(self):
+        """
+        destroy the vehicle
+        TODO: change to destructor
+        """
+        self.vehicle.destroy()
+        self.joystick_wheel.stop()
 
 
     # TODO: recover this

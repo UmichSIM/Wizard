@@ -19,6 +19,7 @@ g920_key_map:dict = {
     # WheelKeyType.XBOX: ControlEventType.RESTART_WORLD, # TODO: recover this
     WheelKeyType.VIEW: ControlEventType.TOGGLE_INFO,
     WheelKeyType.MENU: ControlEventType.TOGGLE_HELP,
+    WheelKeyType.X: ControlEventType.CLOSE,
     # WheelKeyType.LSB: ControlEventType.TOGGLE_SENSOR,
     WheelKeyType.LSB: ControlEventType.SWITCH_DRIVER,
     WheelKeyType.RSB: ControlEventType.TOGGLE_CAMERA,

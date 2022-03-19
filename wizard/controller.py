@@ -6,6 +6,8 @@ from wizard.world import World
 from wizard.hud import HUD
 from wizard.drivers.inputs import ControlEventType, InputDevType, InputPacket
 from wizard.carla_modules.vehicle import Vehicle
+from wizard import config
+import pygame
 
 
 
@@ -37,6 +39,7 @@ class Controller:
         self.__vehicle:Vehicle = Vehicle.get_instance()
         # vars
         self.driver:InputDevType = InputDevType.WHEEL
+        self.__stopping = False
 
         # events handling
         self.__event_lock:Lock = Lock()
@@ -55,6 +58,7 @@ class Controller:
             self.__vehicle.set_steer, # Steer
             lambda data: None, # Clutch
             self.__vehicle.switch_driver,  # switch driver
+            lambda data: self.stop(), # Close program
         ]
         # start multithreading
         self.__vehicle.start()
@@ -81,6 +85,19 @@ class Controller:
             self.__eventsq.put_nowait(InputPacket(event_type,dev,val))
 
 
+    def run(self, clock, display):
+        """
+        run the program main loop
+        TODO: clean this
+        """
+        while True:
+            if self.__stopping: return
+            clock.tick_busy_loop(config.client_frame_rate)
+            self.tick(clock)
+            self.__world.render(display)
+            pygame.display.flip()
+
+
     def tick(self,clock):
         """
         Update all the stuffs in the main loop
@@ -99,6 +116,7 @@ class Controller:
                 pac:InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
 
+
     def __toggle_cam(self):
         "Toggle camera perspective"
         self.__world.camera_manager.toggle_camera()
@@ -106,3 +124,10 @@ class Controller:
     def __toggle_sensor(self):
         "Toggle sensor used"
         self.__world.camera_manager.next_sensor()
+
+
+    def stop(self):
+        """
+        Stop the program by setting stopping flag
+        """
+        self.__stopping = True

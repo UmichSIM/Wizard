@@ -41,6 +41,8 @@ class BaseWheel(ABC):
         # FF id
         self._ff_spring_id = None
         self._ff_autocenter_val:int = 0
+        # stop thread
+        self._thread_terminating:bool = False
 
 
     def __del__(self):
@@ -87,16 +89,23 @@ class BaseWheel(ABC):
         "start the thread"
         self._thread.start()
 
+    def stop(self):
+        "stop the thread"
+        self._thread_terminating = True
+
 
     def events_handler(self) -> None:
         '''
         Capture and handle events
-        TODO: set stop flag for thread
         '''
         from wizard.controller import Controller
         for event in self._ev.read_loop():
+            # return if terminated
+            if self._thread_terminating: return
             if event.type in self.ev_type_accepted:
+                # key based on raw code
                 key_type:WheelKeyType = self.ev_events[event.type].get(event.code)
+                # controller event
                 event_type:ControlEventType = self._ctl_key_map.get(key_type,
                                                                     ControlEventType.NONE)
                 if event_type is not ControlEventType.NONE:
