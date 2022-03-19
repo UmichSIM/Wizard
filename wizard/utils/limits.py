@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Get the limit values
+Usage: iinfo(uint16).max/low
 """
 
 import numpy as np

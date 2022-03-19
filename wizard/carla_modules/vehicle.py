@@ -4,6 +4,7 @@ import carla
 from wizard.drivers.inputs import InputDevType, InputPacket
 from wizard import config
 from wizard.config import WheelType
+from evdev import ecodes
 
 class Vehicle:
     """
@@ -94,17 +95,22 @@ class Vehicle:
 
 
     def update(self):
+        """
+        Update the vehicle status
+        """
         self.driver = self._get_driver()
         if self.driver == config.client_mode:
             self.vehicle.apply_control(self._ctl)
+            # erase spring effect
+            self.joystick_wheel.erase_ff(ecodes.FF_SPRING)
             # force feedback based on current states
-            self.joystick_wheel.SetAutoCenter()
-            # TODO: change
-            self.joystick_wheel.erase_effect()
-        else: 
-            self._ctl = self.vehicle.get_control()
+            self.joystick_wheel.SetSpeedFeedback()
+        else:
+            ctl = self.vehicle.get_control()
+            # erase auto-center
+            self.joystick_wheel.erase_ff(ecodes.FF_AUTOCENTER)
             # force follow
-            self.joystick_wheel.setFF_spring(int(self._ctl.steer*32767))
+            self.joystick_wheel.SetWheelPos(ctl.steer)
 
 
     def set_brake(self,data:InputPacket):

@@ -8,6 +8,10 @@
 
 ## Changelog
 
++ 22.03.18
+  + add spring force that maintain the racing wheel at certain position
+  + add wheel follow when the agent is not in control
+  + update apis for racing wheels
 + 22.03.16
   + add poetry to manage packages and environments
   + rename linux folder to wizard
