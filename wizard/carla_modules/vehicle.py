@@ -109,7 +109,9 @@ class Vehicle:
         """
         self.driver = self._get_driver()
         if self.driver == config.client_mode:
+            # update control
             self.vehicle.apply_control(self._local_ctl)
+            self._carla_ctl = self._local_ctl
             # erase spring effect
             self.joystick_wheel.erase_ff(ecodes.FF_SPRING)
             # force feedback based on current states
