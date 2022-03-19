@@ -43,28 +43,34 @@ class Vehicle:
                 if vehicle.get_physics_control().max_rpm % 10 != 0:
                     self.vehicle:carla.Vehicle = vehicle
 
-        self._ctl:carla.VehicleControl = carla.VehicleControl()
+        # control info from agent racing wheel
+        self._local_ctl:carla.VehicleControl = carla.VehicleControl()
+        # control info from carla server
+        self._carla_ctl:carla.VehicleControl = carla.VehicleControl()
+        # who is driving
         self.driver:InputDevType = self._get_driver()
         self.joystick_wheel:WheelType = WheelType(config.client_mode)
 
 
     @staticmethod
     def get_instance():
+        "get the instance of the singleton"
         if Vehicle.__instance is None:
             raise Exception("Error: Class Vehicle not initialized")
         return Vehicle.__instance
+
 
     def start(self):
         self.joystick_wheel.start()
 
 
+    # TODO: recover this
     def change_vehicle(self, blueprint, spawn_point):
         "Using carla api to change the current vehicle"
         from wizard.world import World
         self.vehicle.destroy()
         self.vehicle:carla.Vehicle = \
             World.get_instance().world.try_spawn_actor(blueprint, spawn_point)
-        self._ctl:carla.VehicleControl = carla.VehicleControl()
 
 
     def switch_driver(self,data:InputPacket):
@@ -82,9 +88,9 @@ class Vehicle:
             vpc.max_rpm-=1
 
         self.vehicle.apply_physics_control(vpc)
-        # should reinit the control
-        self._ctl = carla.VehicleControl()
-        self.vehicle.apply_control(self._ctl)
+        # should reinit the control TODO: why?
+        # self._ctl = carla.VehicleControl()
+        # self.vehicle.apply_control(self._ctl)
 
 
     def get_transform(self):
@@ -103,41 +109,41 @@ class Vehicle:
         """
         self.driver = self._get_driver()
         if self.driver == config.client_mode:
-            self.vehicle.apply_control(self._ctl)
+            self.vehicle.apply_control(self._local_ctl)
             # erase spring effect
             self.joystick_wheel.erase_ff(ecodes.FF_SPRING)
             # force feedback based on current states
             self.joystick_wheel.SetSpeedFeedback()
         else:
-            ctl = self.vehicle.get_control()
+            self._carla_ctl = self.vehicle.get_control()
             # erase auto-center
             self.joystick_wheel.erase_ff(ecodes.FF_AUTOCENTER)
             # force follow
-            self.joystick_wheel.SetWheelPos(ctl.steer)
+            self.joystick_wheel.SetWheelPos(self._carla_ctl.steer)
 
 
     def set_brake(self,data:InputPacket):
         "set the vehicle brake value"
-        self._ctl.brake = self.joystick_wheel.PedalMap(data.val)
+        self._local_ctl.brake = self.joystick_wheel.PedalMap(data.val)
 
 
     def set_throttle(self,data:InputPacket):
         "set the vehicle throttle value"
-        self._ctl.throttle = self.joystick_wheel.PedalMap(data.val)
+        self._local_ctl.throttle = self.joystick_wheel.PedalMap(data.val)
 
     def set_steer(self,data:InputPacket):
         "set the vehicle steer value"
-        self._ctl.steer = self.joystick_wheel.SteerMap(data.val)
+        self._local_ctl.steer = self.joystick_wheel.SteerMap(data.val)
 
 
     def set_reverse(self,dev:InputDevType, val:bool):
         "Set the inverse mode of the vehicle"
-        self._ctl.reverse = val
+        self._local_ctl.reverse = val
 
 
     def get_control(self):
         "From carla api"
-        return self._ctl
+        return self._carla_ctl
 
 
     def _get_driver(self) -> InputDevType:
