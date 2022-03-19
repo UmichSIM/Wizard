@@ -33,7 +33,7 @@ class Vehicle:
             self.vehicle:carla.Vehicle = \
                 world.world.try_spawn_actor(blueprint, spawn_point)
             vpc = self.vehicle.get_physics_control()
-            vpc.max_rpm+=1 # indicate that the vehicle is controlled manually
+            vpc.max_rpm-=1 # indicate that the vehicle is controlled manually
             self.vehicle.apply_physics_control(vpc)
         else: # wizard mode, prompt to choose vehicle
             vehicles = world.world.get_actors().filter('vehicle.*')
@@ -55,6 +55,7 @@ class Vehicle:
     def start(self):
         self.joystick_wheel.start()
 
+
     def change_vehicle(self, blueprint, spawn_point):
         "Using carla api to change the current vehicle"
         from wizard.world import World
@@ -73,10 +74,10 @@ class Vehicle:
         # change user
         if self.driver == InputDevType.WIZARD:
             self.driver = InputDevType.WHEEL
-            vpc.max_rpm-=1
+            vpc.max_rpm+=1
         else:
             self.driver = InputDevType.WIZARD
-            vpc.max_rpm+=1
+            vpc.max_rpm-=1
 
         self.vehicle.apply_physics_control(vpc)
         # should reinit the control
@@ -138,11 +139,11 @@ class Vehicle:
 
 
     def _get_driver(self) -> InputDevType:
-        "Get the current driver as string"
+        "Get the current driver"
         vpc = self.vehicle.get_physics_control()
-        if vpc.max_rpm % 10 == 1:
+        if vpc.max_rpm % 10 == 9:
             return InputDevType.WHEEL
-        elif vpc.max_rpm % 10 == 2:
+        elif vpc.max_rpm % 10 == 8:
             return InputDevType.WIZARD
         else:
             raise Exception("Invalid max_rpm: {}".format(vpc.max_rpm))

@@ -143,7 +143,7 @@ class BaseWheel(ABC):
         spring_id = self._ev.upload_effect(
             ff.Effect(ecodes.FF_SPRING, -1, 16384,
                       ff.Trigger(0,0),
-                      ff.Replay(iinfo(int16),0),
+                      ff.Replay(iinfo(int16).max,0),
                       ff.EffectType(ff_condition_effect = springs)))
 
         # apply
