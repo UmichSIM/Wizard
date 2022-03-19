@@ -49,7 +49,7 @@ class BaseWheel(ABC):
 
     def _init(self):
         # init with 75% autocenter force
-        self._setFFAutoCenter(49150)
+        # self._setFFAutoCenter(49150)
         print("Racing wheel registered")
 
 
@@ -66,7 +66,7 @@ class BaseWheel(ABC):
         if(speed > S2W_THRESHOLD):
             speed = S2W_THRESHOLD
         # autocenterCmd  \in [0,65535]
-        autocenterCmd:int = int((math.sin(speed/S2W_THRESHOLD)+1)/2*iinfo(uint16).max)
+        autocenterCmd:int = int(abs(math.sin(speed/S2W_THRESHOLD))*iinfo(uint16).max)
 
         # send autocenterCmd to the steeringwheel
         self._setFFAutoCenter(autocenterCmd)
