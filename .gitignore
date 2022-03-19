@@ -1,4 +1,5 @@
 __pycache__/
 _out/
+.idea/
 *.swp
 *.lock

@@ -4,6 +4,7 @@ import carla
 from wizard.drivers.inputs import InputDevType, InputPacket
 from wizard import config
 from wizard.config import WheelType
+from evdev import ecodes
 
 class Vehicle:
     """
@@ -32,12 +33,14 @@ class Vehicle:
             self.vehicle:carla.Vehicle = \
                 world.world.try_spawn_actor(blueprint, spawn_point)
             vpc = self.vehicle.get_physics_control()
-            vpc.max_rpm+=1 # indicate that the vehicle is controlled manually
+            vpc.max_rpm-=1 # indicate that the vehicle is controlled manually
             self.vehicle.apply_physics_control(vpc)
+            vpc = self.vehicle.get_physics_control()
+            print(vpc.max_rpm)
         else: # wizard mode, prompt to choose vehicle
             vehicles = world.world.get_actors().filter('vehicle.*')
             for vehicle in vehicles:
-                if vehicle.get_physics_control().max_rpm != 5000:
+                if vehicle.get_physics_control().max_rpm % 10 != 0:
                     self.vehicle:carla.Vehicle = vehicle
 
         self._ctl:carla.VehicleControl = carla.VehicleControl()
@@ -53,6 +56,7 @@ class Vehicle:
 
     def start(self):
         self.joystick_wheel.start()
+
 
     def change_vehicle(self, blueprint, spawn_point):
         "Using carla api to change the current vehicle"
@@ -72,14 +76,15 @@ class Vehicle:
         # change user
         if self.driver == InputDevType.WIZARD:
             self.driver = InputDevType.WHEEL
-            vpc.max_rpm-=1
+            vpc.max_rpm+=1
         else:
             self.driver = InputDevType.WIZARD
-            vpc.max_rpm+=1
+            vpc.max_rpm-=1
 
         self.vehicle.apply_physics_control(vpc)
         # should reinit the control
-        # self._ctl = carla.VehicleControl()
+        self._ctl = carla.VehicleControl()
+        self.vehicle.apply_control(self._ctl)
 
 
     def get_transform(self):
@@ -93,14 +98,22 @@ class Vehicle:
 
 
     def update(self):
+        """
+        Update the vehicle status
+        """
         self.driver = self._get_driver()
         if self.driver == config.client_mode:
             self.vehicle.apply_control(self._ctl)
-        else: 
-            self._ctl = self.vehicle.get_control()
-        
-        # force feedback based on current states
-        self.joystick_wheel.SetAutoCenter()
+            # erase spring effect
+            self.joystick_wheel.erase_ff(ecodes.FF_SPRING)
+            # force feedback based on current states
+            self.joystick_wheel.SetSpeedFeedback()
+        else:
+            ctl = self.vehicle.get_control()
+            # erase auto-center
+            self.joystick_wheel.erase_ff(ecodes.FF_AUTOCENTER)
+            # force follow
+            self.joystick_wheel.SetWheelPos(ctl.steer)
 
 
     def set_brake(self,data:InputPacket):
@@ -128,11 +141,11 @@ class Vehicle:
 
 
     def _get_driver(self) -> InputDevType:
-        "Get the current driver as string"
+        "Get the current driver"
         vpc = self.vehicle.get_physics_control()
-        if vpc.max_rpm % 10 == 1:
+        if vpc.max_rpm % 10 == 9:
             return InputDevType.WHEEL
-        elif vpc.max_rpm % 10 == 2:
+        elif vpc.max_rpm % 10 == 8:
             return InputDevType.WIZARD
         else:
             raise Exception("Invalid max_rpm: {}".format(vpc.max_rpm))
