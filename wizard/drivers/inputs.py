@@ -46,6 +46,8 @@ class WheelKeyType(IntEnum):
     A = auto(); B = auto(); X = auto(); Y = auto();
     HPAD = auto(); VPAD = auto() # pads in horizon and vertical
     STEER = auto(); CLUTCH = auto(); BRAKE = auto(); ACC = auto()
+    LTOP = auto(); LMID = auto(); LBOT = auto()
+    RTOP = auto(); RMID = auto(); RBOT = auto()
 
 
 

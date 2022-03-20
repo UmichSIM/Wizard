@@ -10,6 +10,9 @@
 
 ## Changelog
 
++ 22.03.19
+  + add function to properly terminate the program
+  + add G27 support, the spring force is not supported
 + 22.03.18
   + add spring force that maintain the racing wheel at certain position
   + add wheel follow when the agent is not in control

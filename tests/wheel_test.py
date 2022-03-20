@@ -7,16 +7,16 @@ from wizard import config
 
 if __name__ == "__main__":
     wheel = config.WheelType(config.client_mode)
-    step = 100
+    step = 0.005
     val = 0
     while True:
         val+=step
         sleep(0.01)
-        if val > 32767:
-            val = 32767
+        if val > 1:
+            val = 1
             step = -step
-        elif val < -32768:
-            val = -32768
+        elif val < -1:
+            val = -1
             step = -step
 
-        wheel.setFF_spring(val)
+        wheel.SetWheelPos(val)
