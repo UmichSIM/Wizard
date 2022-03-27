@@ -36,7 +36,6 @@ class Controller:
         self.__world:World = World.get_instance()
         self.__world.restart()
         self.__hud:HUD = HUD.get_instance()
-        self.__rpc:RPC = RPC.get_instance()
 
         self.__vehicle:Vehicle = Vehicle.get_instance()
         # vars
