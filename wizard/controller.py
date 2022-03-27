@@ -4,6 +4,7 @@ from queue import Queue
 from typing import Callable
 from wizard.world import World
 from wizard.hud import HUD
+from wizard.rpc import RPC
 from wizard.drivers.inputs import ControlEventType, InputDevType, InputPacket
 from wizard.carla_modules.vehicle import Vehicle
 from wizard import config
@@ -32,9 +33,10 @@ class Controller:
         else:
             raise Exception("Error: Reinitialization of Controller")
         # objects and references
-        self.__world = World.get_instance()
+        self.__world:World = World.get_instance()
         self.__world.restart()
-        self.__hud = HUD.get_instance()
+        self.__hud:HUD = HUD.get_instance()
+        self.__rpc:RPC = RPC.get_instance()
 
         self.__vehicle:Vehicle = Vehicle.get_instance()
         # vars

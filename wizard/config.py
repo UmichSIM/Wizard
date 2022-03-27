@@ -4,6 +4,9 @@ from wizard.drivers.G920 import G920
 from wizard.drivers.G27 import G27
 # frame rate for client
 client_frame_rate:int = 60
+# server address
+server_addr:str = "127.0.0.1"
+rpc_port:int = 2003
 # indicate whether to record the game onto the disk
 cam_recording:bool = False
 cam_record_dir:str = "./_out"
