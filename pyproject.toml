@@ -16,7 +16,7 @@ numpy = "^1.19.5"
 msgpack-rpc-python = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
-ipython = "^7.16"
+ipython = "^5.10.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
