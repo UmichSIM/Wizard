@@ -32,9 +32,9 @@ class InputDevType(IntEnum):
         WHEEL: Driver input
         WIZARD: Wizard input as autopilot
     """
-    KBD = 0
-    WHEEL = 1
-    WIZARD = 2
+    WHEEL = 0
+    WIZARD = 1
+    KBD = 2
 
 
 class WheelKeyType(IntEnum):
