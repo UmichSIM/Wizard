@@ -44,7 +44,7 @@ class Vehicle:
         # rpc server
         self._rpc:RPC = RPC.get_instance()
         # who is driving
-        self.driver:InputDevType = self._get_driver()
+        self.driver:InputDevType = self._rpc.get_driver()
         self.joystick_wheel:WheelType = WheelType(config.client_mode)
 
 
