@@ -19,7 +19,7 @@ WheelType = G920
 # WheelType = G27
 
 # device event file
-user_input_event:str = "/dev/input/event16"
+user_input_event:str = "/dev/input/event19"
 
 # key maps for user to configure
 g920_key_map:dict = {
@@ -34,8 +34,8 @@ g920_key_map:dict = {
     WheelKeyType.RSHIFT: ControlEventType.INC_GEAR,
     WheelKeyType.HPAD: ControlEventType.CHANGE_WEATHER,
     WheelKeyType.STEER: ControlEventType.STEER,
-    WheelKeyType.BRAKE: ControlEventType.BRAKE,
-    WheelKeyType.CLUTCH: ControlEventType.CLUTCH,
+    WheelKeyType.BRAKE: ControlEventType.CLUTCH,
+    WheelKeyType.CLUTCH: ControlEventType.BRAKE,
     WheelKeyType.ACC: ControlEventType.ACCELERATOR,
 }
 
