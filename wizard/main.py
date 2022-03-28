@@ -15,7 +15,7 @@ def game_loop(args):
     world = None
 
     try:
-        client = carla.Client(args.host, args.port)
+        client = carla.Client(config.server_addr, args.port)
         client.set_timeout(2.0)
 
         display = pygame.display.set_mode(
@@ -76,6 +76,7 @@ def main():
         help='actor filter (default: "vehicle.*")')
     args = argparser.parse_args()
 
+    config.server_addr = args.host
     if args.wizard:
         config.client_mode = InputDevType.WIZARD
     elif args.user:

@@ -4,6 +4,9 @@ from wizard.drivers.G920 import G920
 from wizard.drivers.G27 import G27
 # frame rate for client
 client_frame_rate:int = 60
+# server address
+server_addr:str = "127.0.0.1"
+rpc_port:int = 2003
 # indicate whether to record the game onto the disk
 cam_recording:bool = False
 cam_record_dir:str = "./_out"
@@ -16,7 +19,7 @@ WheelType = G920
 # WheelType = G27
 
 # device event file
-user_input_event:str = "/dev/input/event16"
+user_input_event:str = "/dev/input/event19"
 
 # key maps for user to configure
 g920_key_map:dict = {
@@ -31,8 +34,8 @@ g920_key_map:dict = {
     WheelKeyType.RSHIFT: ControlEventType.INC_GEAR,
     WheelKeyType.HPAD: ControlEventType.CHANGE_WEATHER,
     WheelKeyType.STEER: ControlEventType.STEER,
-    WheelKeyType.BRAKE: ControlEventType.BRAKE,
-    WheelKeyType.CLUTCH: ControlEventType.CLUTCH,
+    WheelKeyType.BRAKE: ControlEventType.CLUTCH,
+    WheelKeyType.CLUTCH: ControlEventType.BRAKE,
     WheelKeyType.ACC: ControlEventType.ACCELERATOR,
 }
 

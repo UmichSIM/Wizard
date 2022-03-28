@@ -3,6 +3,7 @@ from time import time
 import carla
 from wizard.drivers.inputs import InputDevType, InputPacket
 from wizard import config
+from wizard.rpc import RPC
 from wizard.config import WheelType
 from evdev import ecodes
 
@@ -27,27 +28,23 @@ class Vehicle:
             raise Exception("Error: Reinitialization of Vehicle.")
 
         from wizard.world import World
-        # user mode, directly create vehicles
         world = World.get_instance()
+        # user mode, directly create vehicles
         if config.client_mode == InputDevType.WHEEL:
             self.vehicle:carla.Vehicle = \
                 world.world.try_spawn_actor(blueprint, spawn_point)
-            vpc = self.vehicle.get_physics_control()
-            vpc.max_rpm-=1 # indicate that the vehicle is controlled manually
-            self.vehicle.apply_physics_control(vpc)
-            vpc = self.vehicle.get_physics_control()
-        else: # wizard mode, prompt to choose vehicle
+        else: # wizard mode TODO: prompt to choose vehicle
             vehicles = world.world.get_actors().filter('vehicle.*')
-            for vehicle in vehicles:
-                if vehicle.get_physics_control().max_rpm % 10 != 0:
-                    self.vehicle:carla.Vehicle = vehicle
+            self.vehicle:carla.Vehicle = vehicles[0]
 
         # control info from agent racing wheel
         self._local_ctl:carla.VehicleControl = carla.VehicleControl()
         # control info from carla server
         self._carla_ctl:carla.VehicleControl = carla.VehicleControl()
+        # rpc server
+        self._rpc:RPC = RPC.get_instance()
         # who is driving
-        self.driver:InputDevType = self._get_driver()
+        self.driver:InputDevType = self._rpc.get_driver()
         self.joystick_wheel:WheelType = WheelType(config.client_mode)
 
 
@@ -86,16 +83,13 @@ class Vehicle:
         assert(data.dev == InputDevType.WIZARD or data.dev == InputDevType.WHEEL)
         # react on push
         if data.val != 1: return
-        vpc = self.vehicle.get_physics_control()
         # change user
         if self.driver == InputDevType.WIZARD:
             self.driver = InputDevType.WHEEL
-            vpc.max_rpm+=1
         else:
             self.driver = InputDevType.WIZARD
-            vpc.max_rpm-=1
+        self._rpc.set_driver(self.driver)
 
-        self.vehicle.apply_physics_control(vpc)
         # should reinit the control TODO: why?
         # self._ctl = carla.VehicleControl()
         # self.vehicle.apply_control(self._ctl)
@@ -115,7 +109,7 @@ class Vehicle:
         """
         Update the vehicle status
         """
-        self.driver = self._get_driver()
+        self.driver = self._rpc.get_driver()
         if self.driver == config.client_mode:
             # update control
             self.vehicle.apply_control(self._local_ctl)
@@ -154,17 +148,6 @@ class Vehicle:
     def get_control(self):
         "From carla api"
         return self._carla_ctl
-
-
-    def _get_driver(self) -> InputDevType:
-        "Get the current driver"
-        vpc = self.vehicle.get_physics_control()
-        if vpc.max_rpm % 10 == 9:
-            return InputDevType.WHEEL
-        elif vpc.max_rpm % 10 == 8:
-            return InputDevType.WIZARD
-        else:
-            raise Exception("Invalid max_rpm: {}".format(vpc.max_rpm))
 
 
     def get_driver_name(self) -> str:
