@@ -10,6 +10,8 @@
 
 ## Changelog
 
++ 22.04.07
+  + use the second server to synchronize wheel
 + 22.03.19
   + add function to properly terminate the program
   + add G27 support, the spring force is not supported

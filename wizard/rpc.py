@@ -36,7 +36,7 @@ class RPC:
         return InputDevType(self.client.call("get_driver"))
 
 
-    def set_wheel(self, pos:int):
+    def set_wheel(self, pos:float):
         """
         upload the wheel position to the server
         Input: pos: position of the racing wheel
@@ -44,6 +44,6 @@ class RPC:
         self.client.call("set_wheel", pos)
 
 
-    def get_wheel(self) -> int:
+    def get_wheel(self) -> float:
         "get the wheel information"
         return self.client.call("get_wheel")

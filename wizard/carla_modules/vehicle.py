@@ -118,12 +118,14 @@ class Vehicle:
             self.joystick_wheel.erase_ff(ecodes.FF_SPRING)
             # force feedback based on current states
             self.joystick_wheel.SetSpeedFeedback()
+            # upload wheel position
+            self._rpc.set_wheel(self._carla_ctl.steer)
         else:
             self._carla_ctl = self.vehicle.get_control()
             # erase auto-center
             self.joystick_wheel.erase_ff(ecodes.FF_AUTOCENTER)
             # force follow
-            self.joystick_wheel.SetWheelPos(self._carla_ctl.steer)
+            self.joystick_wheel.SetWheelPos(self._rpc.get_wheel())
 
 
     def set_brake(self,data:InputPacket):
