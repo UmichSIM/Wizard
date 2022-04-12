@@ -45,6 +45,37 @@ python wizard/main.py
 
 The client program needs the Carla server to be running, use command line options to change the default host and port.
 
+## Overall Project setup
+1. Start the CARLA server(GUI and Map Team perhaps can help)
+
+2. Start the [wizard server](https://github.com/UmichSIM/Wizard-Server)
+
+3. connect the racing wheel and indicate the device path in `wizard/config.py`
+
+   + find the device path
+
+   ```bash
+   # note the event number in the H field
+   cat /proc/bus/input/devices
+   ```
+
+   + edit `wizard/config.py` file and change the file path if needed
+
+   ```python
+   # device event file
+   user_input_event:str = "/dev/input/eventX"
+   ```
+
+4. run the program
+
+```bash
+python wizard/main.py
+# for wizard side, use
+python wizard/main.py --host <host> --wizard
+```
+
+
+
 ## Maintainers
 
 ## License
