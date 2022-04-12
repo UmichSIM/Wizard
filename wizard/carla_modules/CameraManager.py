@@ -6,7 +6,7 @@ import weakref
 import os
 import time
 import pygame
-import config
+from wizard import config
 from wizard.world import World
 from wizard.hud import HUD
 from wizard.carla_modules.vehicle import Vehicle

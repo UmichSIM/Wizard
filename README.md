@@ -74,13 +74,23 @@ python wizard/main.py
 python wizard/main.py --host <host> --wizard
 ```
 
+## Documentation
+
+1. see the [project wiki](https://github.com/UmichSIM/Wizard/wiki) for hardware setups
+2. use `pdoc3` to view the overall code structure
+
+```bash
+# assume poetry environment is activated
+pdoc3 --http : wizard
+```
+
+
+
 
 
 ## Maintainers
 
-## License
-
-
+Umich Driving Simulator Wizard Team
 
 
 
