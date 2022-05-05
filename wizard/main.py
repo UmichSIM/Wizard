@@ -59,6 +59,11 @@ def main():
         default='127.0.0.1',
         help='IP of the host server (default: 127.0.0.1)')
     argparser.add_argument(
+        '-d', '--dev',
+        metavar='H',
+        default=config.user_input_event,
+        help='device handler for racing wheel')
+    argparser.add_argument(
         '-p', '--port',
         metavar='P',
         default=2000,
@@ -77,6 +82,7 @@ def main():
     args = argparser.parse_args()
 
     config.server_addr = args.host
+    config.user_input_event = args.dev
     if args.wizard:
         config.client_mode = InputDevType.WIZARD
     elif args.user:
