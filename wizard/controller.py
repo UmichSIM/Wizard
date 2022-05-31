@@ -11,9 +11,7 @@ from wizard import config
 import pygame
 
 
-
-
-def onpush(func:Callable) -> Callable:
+def onpush(func: Callable) -> Callable:
     """
     Execute the function if the button is pushed,
     used in event handling
@@ -26,6 +24,7 @@ class Controller:
     Main Controller of the wizard
     """
     __instance = None
+
     def __init__(self):
         # singleton
         if Controller.__instance is None:
@@ -33,38 +32,38 @@ class Controller:
         else:
             raise Exception("Error: Reinitialization of Controller")
         # objects and references
-        self.__world:World = World.get_instance()
+        self.__world: World = World.get_instance()
         self.__world.restart()
-        self.__hud:HUD = HUD.get_instance()
+        self.__hud: HUD = HUD.get_instance()
 
-        self.__vehicle:Vehicle = Vehicle.get_instance()
+        self.__vehicle: Vehicle = Vehicle.get_instance()
         # vars
-        self.driver:InputDevType = InputDevType.WHEEL
+        self.driver: InputDevType = InputDevType.WHEEL
         self.__stopping = False
 
         # events handling
-        self.__event_lock:Lock = Lock()
-        self.__eventsq:Queue = Queue()
-        self.__event_handlers:list = [
-            onpush(self.__world.next_weather), # change weather
-            onpush(self.__world.restart), # restart world
-            onpush(self.__hud.toggle_info), # toggle info
-            onpush(self.__toggle_cam), # toggle camera
-            onpush(self.__toggle_sensor), # toggle sensor
-            onpush(self.__hud.help.toggle), # toggle help
-            lambda data: self.__vehicle.set_reverse(data.dev, True), # Decrease Gear
-            lambda data: self.__vehicle.set_reverse(data.dev, False), # Increate Gear
-            self.__vehicle.set_throttle, # Accelerator
-            self.__vehicle.set_brake, # Brake
-            self.__vehicle.set_steer, # Steer
-            lambda data: None, # Clutch
+        self.__event_lock: Lock = Lock()
+        self.__eventsq: Queue = Queue()
+        self.__event_handlers: list = [
+            onpush(self.__world.next_weather),  # change weather
+            onpush(self.__world.restart),  # restart world
+            onpush(self.__hud.toggle_info),  # toggle info
+            onpush(self.__toggle_cam),  # toggle camera
+            onpush(self.__toggle_sensor),  # toggle sensor
+            onpush(self.__hud.help.toggle),  # toggle help
+            lambda data: self.__vehicle.set_reverse(data.dev, True
+                                                    ),  # Decrease Gear
+            lambda data: self.__vehicle.set_reverse(data.dev, False
+                                                    ),  # Increate Gear
+            self.__vehicle.set_throttle,  # Accelerator
+            self.__vehicle.set_brake,  # Brake
+            self.__vehicle.set_steer,  # Steer
+            lambda data: None,  # Clutch
             self.__vehicle.switch_driver,  # switch driver
-            lambda data: self.stop(), # Close program
+            lambda data: self.stop(),  # Close program
         ]
         # start multithreading
         self.__vehicle.start()
-
-
 
     @staticmethod
     def get_instance():
@@ -72,9 +71,10 @@ class Controller:
             Controller.__instance = Controller()
         return Controller.__instance
 
-
-    def register_event(self,event_type:ControlEventType,
-                       dev:InputDevType=InputDevType.KBD,val:int=0)->None:
+    def register_event(self,
+                       event_type: ControlEventType,
+                       dev: InputDevType = InputDevType.KBD,
+                       val: int = 0) -> None:
         """
         Register the input event into the event queue
         Inputs:
@@ -83,8 +83,7 @@ class Controller:
             val: Additional data field
         """
         with self.__event_lock:
-            self.__eventsq.put_nowait(InputPacket(event_type,dev,val))
-
+            self.__eventsq.put_nowait(InputPacket(event_type, dev, val))
 
     def run(self, clock, display):
         """
@@ -98,8 +97,7 @@ class Controller:
             self.__world.render(display)
             pygame.display.flip()
 
-
-    def tick(self,clock):
+    def tick(self, clock):
         """
         Update all the stuffs in the main loop
         """
@@ -107,6 +105,12 @@ class Controller:
         self.__vehicle.update()
         self.__hud.tick(clock)
 
+    def tick_no_control(self, clock):
+        """
+        GUI compatible tick
+        """
+        self.handle_events()
+        return self.__vehicle.get_control()
 
     def handle_events(self):
         """
@@ -114,9 +118,8 @@ class Controller:
         """
         while not self.__eventsq.empty():
             with self.__event_lock:
-                pac:InputPacket = self.__eventsq.get_nowait()
+                pac: InputPacket = self.__eventsq.get_nowait()
             self.__event_handlers[pac.event_type](pac)
-
 
     def __toggle_cam(self):
         "Toggle camera perspective"
@@ -125,7 +128,6 @@ class Controller:
     def __toggle_sensor(self):
         "Toggle sensor used"
         self.__world.camera_manager.next_sensor()
-
 
     def stop(self):
         """
