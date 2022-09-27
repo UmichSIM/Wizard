@@ -9,7 +9,6 @@ from wizard.utils.limits import *
 from wizard.drivers.inputs import InputDevType, WheelKeyType,ControlEventType
 from wizard import config
 
-
 class BaseWheel(ABC):
     """
     Abstract wheel class to be inherited

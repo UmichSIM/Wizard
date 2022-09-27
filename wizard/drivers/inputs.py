@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from enum import IntEnum, auto
 
+
 class ControlEventType(IntEnum):
     """
     Enum indicating the event requested for controller to handle
@@ -22,8 +23,9 @@ class ControlEventType(IntEnum):
     CLUTCH = auto()
     # Controls
     SWITCH_DRIVER = auto()
-    CLOSE = auto() # close the program
-    NONE = auto() # do nothing
+    CLOSE = auto()  # close the program
+    NONE = auto()  # do nothing
+
 
 class InputDevType(IntEnum):
     """
@@ -40,15 +42,38 @@ class InputDevType(IntEnum):
 class WheelKeyType(IntEnum):
     "Enum indicating the keys on the racing wheel"
     XBOX = 0
-    LSB = auto(); RSB = auto()
-    LSHIFT = auto(); RSHIFT = auto()
-    VIEW = auto(); MENU = auto()
-    A = auto(); B = auto(); X = auto(); Y = auto();
-    HPAD = auto(); VPAD = auto() # pads in horizon and vertical
-    STEER = auto(); CLUTCH = auto(); BRAKE = auto(); ACC = auto()
-    LTOP = auto(); LMID = auto(); LBOT = auto()
-    RTOP = auto(); RMID = auto(); RBOT = auto()
-
+    LSB = auto()
+    RSB = auto()
+    LSHIFT = auto()
+    RSHIFT = auto()
+    L2 = auto()
+    L3 = auto()
+    R2 = auto()
+    R3 = auto()
+    VIEW = auto()
+    MENU = auto()
+    # control buttons
+    A = auto()
+    B = auto()
+    X = auto()
+    Y = auto()
+    CROSS = auto()
+    CIRCLE = auto()
+    SQUARE = auto()
+    TRIANGLE = auto()
+    # pads in horizon and vertical
+    VPAD = auto()
+    HPAD = auto()
+    STEER = auto()
+    CLUTCH = auto()
+    BRAKE = auto()
+    ACC = auto()
+    LTOP = auto()
+    LMID = auto()
+    LBOT = auto()
+    RTOP = auto()
+    RMID = auto()
+    RBOT = auto()
 
 
 @dataclass
@@ -56,6 +81,6 @@ class InputPacket:
     """
     dataclass carrying data to controller
     """
-    event_type:ControlEventType
-    dev:InputDevType
-    val:int
+    event_type: ControlEventType
+    dev: InputDevType
+    val: int
