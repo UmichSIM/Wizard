@@ -36,8 +36,8 @@ class RumbleStripSensor(object):
         # debug
         text = ['%r' % str(x).split()[-1] for x in lane_types]
         self.hud.notification('RumbleStrip - Crossed line %s' % ' and '.join(text))
-
+        print(lane_types)
+        
         if self.RStype in lane_types:
-            return True
-        else:
-            return False
+            Vehicle.get_instance().set_collision()
+            

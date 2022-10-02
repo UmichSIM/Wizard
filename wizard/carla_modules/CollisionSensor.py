@@ -44,3 +44,4 @@ class CollisionSensor:
         self.history.append((event.frame, intensity))
         if len(self.history) > 4000:
             self.history.pop(0)
+        Vehicle.get_instance().set_collision()

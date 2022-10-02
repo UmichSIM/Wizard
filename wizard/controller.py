@@ -20,7 +20,6 @@ def onpush(func:Callable) -> Callable:
     """
     return lambda data: func() if data.val == 1 else None
 
-
 class Controller:
     """
     Main Controller of the wizard

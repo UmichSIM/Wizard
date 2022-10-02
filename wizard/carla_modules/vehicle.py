@@ -46,6 +46,8 @@ class Vehicle:
         # who is driving
         self.driver:InputDevType = self._rpc.get_driver()
         self.joystick_wheel:WheelType = WheelType(config.client_mode)
+        
+        self.is_rumbling: bool = False
 
 
     @staticmethod
@@ -103,6 +105,17 @@ class Vehicle:
     def get_velocity(self):
         "from carla Vehicle api"
         return self.vehicle.get_velocity()
+    
+    
+    # def set_rumble(self, val:bool):
+    #     if self.is_rumbling != val:
+    #         if val:
+    #             self.joystick_wheel.rumble_start()
+    #         else:
+    #             self.joystick_wheel.rumble_stop()
+                
+    def set_collision(self, duration:int=500):
+        self.joystick_wheel.collision_effect()
 
 
     def update(self):

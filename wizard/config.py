@@ -16,9 +16,9 @@ cam_record_dir: str = "./_out"
 client_mode: InputDevType = InputDevType.WHEEL
 
 # The wheel model to use
-# WheelType = G920
+WheelType = G920
 # WheelType = G27
-WheelType = G29
+# WheelType = G29
 
 # device event file
 user_input_event: str = "/dev/input/event7"
