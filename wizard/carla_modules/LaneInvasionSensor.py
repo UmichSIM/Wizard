@@ -8,8 +8,14 @@ from wizard.carla_modules.vehicle import Vehicle
 class LaneInvasionSensor(object):
     """
     Sensor to detect Lane Invasion
+
+    If Rumble Strip, send rumble() command to driving wheel (only capatible with G920 now).
+    It is done by detecting the 'LaneMarkingType' of the rumble strip.
     """
     def __init__(self):
+        self.rumble_lanemarkingtype = "SolidSolid"
+        # TODO: use official lane marking type
+        # self.rumble_lanemarkingtype = carla.?
         self.sensor = None
         self._parent = Vehicle.get_instance().vehicle
         self.hud = HUD.get_instance()
@@ -31,3 +37,5 @@ class LaneInvasionSensor(object):
         text = ['%r' % str(x).split()[-1] for x in lane_types]
         self.hud.notification('Crossed line %s' % ' and '.join(text))
         
+        if self.rumble_lanemarkingtype in text:
+            Vehicle.get_instance().set_collision()
