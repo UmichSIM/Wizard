@@ -1,6 +1,8 @@
 # Wizard _(Client Program for Umich-SIM)_
+**NOTE**: ****DEPRECATED****, the program is now merged into [SIM_MDP_GUI](https://github.com/UmichSIM/SIM_MDP_GUI).
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+
 
 Repository for Wizard of Oz Project.
 
